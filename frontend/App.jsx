@@ -37,12 +37,12 @@ export default function App() {
       if (hash === 'admin' || hash === 'admin-web') return { page: 'admin' };
       if (hash === 'login') return { page: 'login' };
       if (hash === 'home') return { page: 'home' };
-      if (hash === 'portal') return { page: 'portal' };
+      if (hash === 'portal') return { page: 'home' };
       if (hash && hash !== '') return { page: hash };
     } catch {
       // ignore
     }
-    return { page: 'portal' };
+    return { page: 'home' };
   });
   const [navHistory, setNavHistory] = useState([]);
   const [cartItems, setCartItems] = useState([]);

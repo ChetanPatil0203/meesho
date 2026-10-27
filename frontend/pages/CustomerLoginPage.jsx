@@ -11,11 +11,7 @@ export default function CustomerLoginPage({
   onShowToast,
   onShowIncomingOtp,
   onShowRegistrationSms,
-  initialRole = 'user', // 'user' | 'admin'
 }) {
-  // Login Role: 'user' | 'admin' (Default: 'user')
-  const [loginRole, setLoginRole] = useState(initialRole);
-
   // User Mode: 'password' | 'otp' | 'signup'
   const [userMode, setUserMode] = useState('password');
 
@@ -44,15 +40,8 @@ export default function CustomerLoginPage({
   const [resendAvailable, setResendAvailable] = useState(false);
   const otpInputRefs = useRef([]);
 
-  // ── Admin Login Form Fields ──
-  const [adminEmail, setAdminEmail] = useState('admin@shopio.com');
-  const [adminPassword, setAdminPassword] = useState('admin123');
-  const [showAdminPassword, setShowAdminPassword] = useState(false);
-  const [adminRememberMe, setAdminRememberMe] = useState(true);
-
   // ── Forgot Password Modal ──
   const [forgotModalOpen, setForgotModalOpen] = useState(false);
-  const [forgotRole, setForgotRole] = useState('user');
   const [forgotInput, setForgotInput] = useState('');
   const [forgotStatus, setForgotStatus] = useState({ sent: false, message: '' });
 
@@ -69,13 +58,6 @@ export default function CustomerLoginPage({
 
   // Clean phone helper
   const cleanNumber = (val) => (val || '').replace(/\D/g, '').slice(-10);
-
-  // Clear messages when role or mode changes
-  const switchRole = (role) => {
-    setLoginRole(role);
-    setErrorMsg('');
-    setSuccessMsg('');
-  };
 
   const switchUserMode = (mode) => {
     setUserMode(mode);
@@ -414,118 +396,7 @@ export default function CustomerLoginPage({
   };
 
   // ─────────────────────────────────────────────────────────────
-  // 4. ADMIN LOGIN (Backend Admin Verification)
-  // ─────────────────────────────────────────────────────────────
-  const handleAdminLogin = async (e) => {
-    e?.preventDefault();
-    setErrorMsg('');
-    setSuccessMsg('');
-
-    const emailTrimmed = adminEmail.trim().toLowerCase();
-
-    // Validation
-    if (!emailTrimmed) {
-      setErrorMsg('Please enter your admin email');
-      onShowToast?.('Please enter your admin email', 'error');
-      return;
-    }
-
-    if (!adminPassword.trim()) {
-      setErrorMsg('Please enter your password');
-      onShowToast?.('Please enter your password', 'error');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      // 1. Clear any active Customer session to prevent mixed session
-      localStorage.removeItem('meesho_user_profile');
-      sessionStorage.removeItem('meesho_user_profile');
-      localStorage.removeItem('shopio_auth_token');
-      localStorage.removeItem('shopio_customer_logged_in');
-
-      // 2. Authenticate directly via existing backend admin endpoint
-      let adminData = null;
-
-      try {
-        const res = await fetch('/api/admin/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: emailTrimmed,
-            password: adminPassword.trim(),
-          }),
-        });
-
-        const data = await res.json();
-
-        if (res.ok && data.user) {
-          if (data.user.role !== 'admin') {
-            throw new Error('Access denied: Account does not have admin privileges.');
-          }
-          adminData = data;
-        } else {
-          throw new Error(data.error || 'Invalid admin credentials or account does not have admin privileges');
-        }
-      } catch (fetchErr) {
-        if (
-          (emailTrimmed === 'admin@meesho.com' || emailTrimmed === 'admin@shopio.com') &&
-          (adminPassword === 'admin123' || adminPassword === 'password')
-        ) {
-          adminData = {
-            message: 'Admin authentication successful',
-            user: {
-              id: 'u_admin',
-              name: 'Super Administrator',
-              email: emailTrimmed,
-              phone: '9876543210',
-              role: 'admin',
-              status: 'active',
-            },
-            token: `shopio_admin_jwt_${Date.now()}`,
-          };
-        } else {
-          throw fetchErr;
-        }
-      }
-
-      // 3. Prepare admin session object
-      const adminObj = {
-        id: adminData.user.id || `adm_${Date.now()}`,
-        name: adminData.user.name || 'Super Administrator',
-        email: adminData.user.email || emailTrimmed,
-        role: 'Super Admin',
-        token: adminData.token || `shopio_admin_jwt_${Date.now()}`,
-        permissions: adminData.permissions || {},
-        loginTime: new Date().toLocaleTimeString(),
-      };
-
-      // 4. Save admin session strictly in standard storage keys
-      if (adminRememberMe) {
-        localStorage.setItem('shopio_admin_user', JSON.stringify(adminObj));
-        localStorage.setItem('shopio_admin_token', adminObj.token);
-      } else {
-        sessionStorage.setItem('shopio_admin_user', JSON.stringify(adminObj));
-        sessionStorage.setItem('shopio_admin_token', adminObj.token);
-      }
-
-      triggerConfetti(1500);
-      onShowToast?.(`Welcome back, ${adminObj.name}! 👑`, 'success');
-
-      // 5. Redirect strictly to Admin Panel
-      if (onSelectAdmin) onSelectAdmin();
-      else if (onNavigate) onNavigate('admin');
-      else window.location.hash = '#admin';
-    } catch (err) {
-      setErrorMsg(err.message || 'Invalid email or password');
-      onShowToast?.(err.message || 'Admin authentication failed', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // ─────────────────────────────────────────────────────────────
-  // 5. FORGOT PASSWORD HELPER
+  // 4. FORGOT PASSWORD HELPER
   // ─────────────────────────────────────────────────────────────
   const handleForgotPasswordSubmit = (e) => {
     e.preventDefault();
@@ -533,10 +404,7 @@ export default function CustomerLoginPage({
 
     setForgotStatus({
       sent: true,
-      message:
-        forgotRole === 'user'
-          ? `Password reset link / OTP has been dispatched to +91 ${forgotInput.trim()}. Please check your SMS.`
-          : `Admin password recovery instructions sent to ${forgotInput.trim()}. Please verify your corporate email.`,
+      message: `Password reset link / OTP has been dispatched to +91 ${forgotInput.trim()}. Please check your SMS.`,
     });
   };
 
@@ -608,41 +476,8 @@ export default function CustomerLoginPage({
               Welcome back to Shopio
             </p>
             <p className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5 sm:mt-1">
-              Choose how you want to login
+              Log in to your account or sign up to continue shopping
             </p>
-          </div>
-
-          {/* ───────────────────────────────────────────────────────────── */}
-          {/* LOGIN TYPE SELECTION: [ 🛍️ User Login ]  [ 🛠️ Admin Login ]    */}
-          {/* ───────────────────────────────────────────────────────────── */}
-          <div className="bg-gray-100/90 dark:bg-gray-800/80 p-1 rounded-2xl flex gap-1 sm:gap-1.5 mb-5 sm:mb-6 border border-gray-200/80 dark:border-gray-700/60 shadow-inner">
-            <button
-              type="button"
-              id="user-login-tab-btn"
-              onClick={() => switchRole('user')}
-              className={`flex-1 py-2.5 sm:py-3 px-2 sm:px-3 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 transition-all cursor-pointer ${
-                loginRole === 'user'
-                  ? 'bg-gradient-to-r from-[#9F2089] to-[#F43397] text-white shadow-md shadow-pink-500/30 scale-[1.02]'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-gray-700/40'
-              }`}
-            >
-              <span className="text-sm sm:text-base">🛍️</span>
-              <span className="truncate">User Login</span>
-            </button>
-
-            <button
-              type="button"
-              id="admin-login-tab-btn"
-              onClick={() => switchRole('admin')}
-              className={`flex-1 py-2.5 sm:py-3 px-2 sm:px-3 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 transition-all cursor-pointer ${
-                loginRole === 'admin'
-                  ? 'bg-gradient-to-r from-purple-700 to-indigo-800 text-white shadow-md shadow-purple-900/40 scale-[1.02]'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-gray-700/40'
-              }`}
-            >
-              <span className="text-sm sm:text-base">🛠️</span>
-              <span className="truncate">Admin Login</span>
-            </button>
           </div>
 
           {/* Error Banner */}
@@ -668,11 +503,8 @@ export default function CustomerLoginPage({
             </div>
           )}
 
-          {/* ============================================================= */}
-          {/* OPTION 1: USER LOGIN                                          */}
-          {/* ============================================================= */}
-          {loginRole === 'user' && (
-            <div>
+          {/* USER LOGIN */}
+          <div>
               {/* User Subheader & Method Switcher */}
               <div className="flex items-center justify-between mb-4 pb-2 border-b border-gray-100 dark:border-gray-800">
                 <span className="text-xs font-black tracking-wider uppercase text-[#9F2089] dark:text-[#F43397] flex items-center gap-1.5">
@@ -794,7 +626,6 @@ export default function CustomerLoginPage({
                     <button
                       type="button"
                       onClick={() => {
-                        setForgotRole('user');
                         setForgotInput(userPhone);
                         setForgotStatus({ sent: false, message: '' });
                         setForgotModalOpen(true);
@@ -1050,191 +881,6 @@ export default function CustomerLoginPage({
                 </form>
               )}
             </div>
-          )}
-
-          {/* ============================================================= */}
-          {/* OPTION 2: ADMIN PANEL LOGIN                                   */}
-          {/* ============================================================= */}
-          {loginRole === 'admin' && (
-            <div>
-              {/* Admin Subheader Badge */}
-              <div className="flex items-center justify-between mb-3 pb-2 border-b border-gray-100 dark:border-gray-800">
-                <span className="text-xs font-black tracking-wider uppercase text-purple-600 dark:text-purple-400 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-purple-600 dark:bg-purple-400"></span>
-                  ADMIN LOGIN
-                </span>
-
-                <span className="text-[10px] font-bold py-0.5 px-2 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
-                  🔒 Restricted Portal
-                </span>
-              </div>
-
-              {/* Direct 1-Click Access Button to Admin Dashboard with Left Sidebar */}
-              <button
-                type="button"
-                onClick={() => {
-                  const adminObj = {
-                    id: 'adm_master_1',
-                    name: 'Super Administrator',
-                    email: 'admin@shopio.com',
-                    role: 'Super Admin',
-                    token: 'shopio_admin_active_jwt',
-                  };
-                  localStorage.setItem('shopio_admin_user', JSON.stringify(adminObj));
-                  onShowToast?.('Admin Dashboard उघडले! 👑', 'success');
-                  if (onSelectAdmin) onSelectAdmin();
-                  else if (onNavigate) onNavigate('admin');
-                  else window.location.hash = '#admin';
-                }}
-                className="w-full py-3.5 px-4 mb-4 rounded-2xl bg-gradient-to-r from-purple-700 via-indigo-600 to-pink-600 hover:from-purple-600 hover:to-indigo-500 text-white font-black text-xs sm:text-sm tracking-wide shadow-xl shadow-purple-900/30 active:scale-[0.98] transition-all cursor-pointer flex items-center justify-between"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">📊</span>
-                  <span>थेट Admin Dashboard उघडा</span>
-                </div>
-                <span className="text-xs bg-white/20 px-2.5 py-1 rounded-xl">Open ➔</span>
-              </button>
-
-              <div className="relative flex py-2 items-center mb-3">
-                <div className="flex-grow border-t border-gray-200 dark:border-gray-700" />
-                <span className="flex-shrink mx-3 text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-                  किंवा Credentials ने Login करा
-                </span>
-                <div className="flex-grow border-t border-gray-200 dark:border-gray-700" />
-              </div>
-
-              <form onSubmit={handleAdminLogin} className="space-y-4">
-                {/* Admin Email */}
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">
-                    Admin Email <span className="text-rose-500">*</span>
-                  </label>
-                  <div className="flex items-center border border-gray-200 dark:border-gray-700 rounded-2xl px-3.5 py-3 focus-within:border-purple-600 focus-within:ring-2 focus-within:ring-purple-100 dark:focus-within:ring-purple-950 transition-all bg-gray-50/60 dark:bg-gray-800/40">
-                    <span className="text-gray-400 mr-2 text-sm select-none">✉️</span>
-                    <input
-                      type="email"
-                      id="admin-email-input"
-                      value={adminEmail}
-                      onChange={(e) => {
-                        setAdminEmail(e.target.value);
-                        setErrorMsg('');
-                      }}
-                      placeholder="admin@shopio.com"
-                      required
-                      className="w-full text-sm font-semibold bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400 outline-none font-mono text-xs sm:text-sm"
-                    />
-                  </div>
-                </div>
-
-                {/* Admin Password */}
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">
-                    Password <span className="text-rose-500">*</span>
-                  </label>
-                  <div className="flex items-center border border-gray-200 dark:border-gray-700 rounded-2xl px-3.5 py-3 focus-within:border-purple-600 focus-within:ring-2 focus-within:ring-purple-100 dark:focus-within:ring-purple-950 transition-all bg-gray-50/60 dark:bg-gray-800/40">
-                    <input
-                      type={showAdminPassword ? 'text' : 'password'}
-                      id="admin-password-input"
-                      value={adminPassword}
-                      onChange={(e) => {
-                        setAdminPassword(e.target.value);
-                        setErrorMsg('');
-                      }}
-                      placeholder="Enter admin password"
-                      required
-                      className="w-full text-sm font-semibold bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400 outline-none"
-                    />
-                    <button
-                      type="button"
-                      id="toggle-admin-password-btn"
-                      onClick={() => setShowAdminPassword(!showAdminPassword)}
-                      className="p-1 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors cursor-pointer select-none"
-                      aria-label={showAdminPassword ? 'Hide password' : 'Show password'}
-                    >
-                      {showAdminPassword ? (
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
-                        </svg>
-                      ) : (
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Remember Me & Forgot Password Row */}
-                <div className="flex items-center justify-between text-xs pt-1">
-                  <label className="flex items-center gap-2 text-gray-600 dark:text-gray-300 font-semibold cursor-pointer select-none">
-                    <input
-                      type="checkbox"
-                      checked={adminRememberMe}
-                      onChange={(e) => setAdminRememberMe(e.target.checked)}
-                      className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500 cursor-pointer"
-                    />
-                    <span>Remember Me</span>
-                  </label>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setForgotRole('admin');
-                      setForgotInput(adminEmail);
-                      setForgotStatus({ sent: false, message: '' });
-                      setForgotModalOpen(true);
-                    }}
-                    className="font-bold text-purple-600 dark:text-purple-400 hover:underline cursor-pointer"
-                  >
-                    Forgot Password?
-                  </button>
-                </div>
-
-                {/* Admin Submit Button */}
-                <button
-                  type="submit"
-                  id="admin-login-submit-btn"
-                  disabled={loading}
-                  className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-purple-700 via-indigo-700 to-purple-800 hover:from-purple-600 hover:to-indigo-600 text-white font-black text-sm tracking-wide shadow-lg shadow-purple-900/30 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
-                >
-                  {loading ? (
-                    <>
-                      <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Authenticating Admin...</span>
-                    </>
-                  ) : (
-                    <span>ADMIN LOGIN</span>
-                  )}
-                </button>
-
-                {/* Quick Fill Demo Admin Helper */}
-                <div className="pt-2 text-center">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setAdminEmail('admin@shopio.com');
-                      setAdminPassword('admin123');
-                      setErrorMsg('');
-                      onShowToast?.('Demo admin credentials filled', 'info');
-                    }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-50 dark:bg-purple-950/40 text-[11px] font-bold text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 hover:bg-purple-100 transition-colors cursor-pointer"
-                  >
-                    <span>👑 Verified Admin:</span>
-                    <span className="font-mono">admin@shopio.com / admin123</span>
-                  </button>
-                </div>
-
-                {/* Security Note */}
-                <div className="mt-4 p-3 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 text-[11px] text-gray-500 dark:text-gray-400 flex items-center gap-2">
-                  <span className="text-base">🛡️</span>
-                  <span>
-                    Backend role validation enforced. Normal users cannot access Admin Panel.
-                  </span>
-                </div>
-              </form>
-            </div>
-          )}
         </div>
       </main>
 
@@ -1260,9 +906,7 @@ export default function CustomerLoginPage({
                 Forgot Password?
               </h3>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                {forgotRole === 'user'
-                  ? 'Enter your mobile number to receive OTP or password reset instructions.'
-                  : 'Enter your admin email to receive corporate reset instructions.'}
+                Enter your mobile number to receive OTP or password reset instructions.
               </p>
             </div>
 
@@ -1283,13 +927,13 @@ export default function CustomerLoginPage({
               <form onSubmit={handleForgotPasswordSubmit} className="space-y-3.5">
                 <div>
                   <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">
-                    {forgotRole === 'user' ? 'Mobile Number' : 'Admin Email'}
+                    Mobile Number
                   </label>
                   <input
-                    type={forgotRole === 'user' ? 'tel' : 'email'}
+                    type="tel"
                     value={forgotInput}
                     onChange={(e) => setForgotInput(e.target.value)}
-                    placeholder={forgotRole === 'user' ? 'Enter 10-digit mobile number' : 'admin@shopio.com'}
+                    placeholder="Enter 10-digit mobile number"
                     required
                     className="w-full border border-gray-200 dark:border-gray-700 rounded-2xl px-3.5 py-2.5 text-xs text-gray-900 dark:text-white bg-gray-50/60 dark:bg-gray-800/40 outline-none focus:border-[#9F2089]"
                   />
