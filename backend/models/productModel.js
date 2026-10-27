@@ -81,7 +81,7 @@ export const productModel = {
         p.delivery || 'Free Delivery by 3-5 days',
         p.badge || null,
         p.inStock !== false ? 1 : 0,
-        p.brand || 'Meesho',
+        p.brand || 'Shopio',
         JSON.stringify(p.specifications || {}),
       ]
     );

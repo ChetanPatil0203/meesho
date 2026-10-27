@@ -1,5 +1,6 @@
 // Frontend API service connecting to Express.js Backend with fallback to local mock data
 import { products as localProducts, categories as localCategories } from '../data/products.js';
+import { styleRecommendationService } from './styleRecommendationService.js';
 
 const API_BASE = '/api';
 
@@ -34,6 +35,11 @@ export const api = {
       console.warn('API getProductById fallback:', err.message);
       return localProducts.find(p => p.id === id) || null;
     }
+  },
+
+  // AI Style Recommendations
+  async getStyleRecommendations(productId, params = {}) {
+    return await styleRecommendationService.getRecommendations({ productId, ...params });
   },
 
   // Categories
@@ -113,6 +119,90 @@ export const api = {
         user: { id: `u_${Date.now()}`, ...userData },
       };
     }
+  },
+
+  // Send Mobile OTP
+  async sendOtp(phone) {
+    const cleanPhone = (phone || '').replace(/\D/g, '').slice(-10);
+    try {
+      const res = await fetch(`${API_BASE}/auth/send-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: cleanPhone }),
+      });
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch {
+      // fallback
+    }
+
+    // Local Fallback
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    sessionStorage.setItem(`shopio_otp_${cleanPhone}`, JSON.stringify({
+      phone: cleanPhone,
+      otp,
+      expiresAt: Date.now() + 10 * 60 * 1000,
+    }));
+
+    return {
+      success: true,
+      phone: cleanPhone,
+      otp,
+      message: `OTP sent successfully to +91 ${cleanPhone}`,
+      smsText: `[Shopio Verification] Your OTP is ${otp}. Valid for 10 minutes. Do not share with anyone.`,
+    };
+  },
+
+  // Verify OTP and Authenticate / Register
+  async verifyOtp({ phone, otp, name, email, password }) {
+    const cleanPhone = (phone || '').replace(/\D/g, '').slice(-10);
+    try {
+      const res = await fetch(`${API_BASE}/auth/verify-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: cleanPhone, otp: otp.trim(), name, email, password }),
+      });
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch {
+      // fallback
+    }
+
+    let stored = null;
+    try {
+      stored = JSON.parse(sessionStorage.getItem(`shopio_otp_${cleanPhone}`) || 'null');
+    } catch {
+      // ignore
+    }
+
+    const isValid = (stored && stored.otp === otp.trim()) || otp.trim() === '123456';
+    if (!isValid) {
+      throw new Error('Invalid OTP code. Please enter the correct code sent to your phone or use 123456.');
+    }
+
+    const userName = name || 'Customer ' + cleanPhone.slice(-4);
+    const userEmail = email || `user${cleanPhone}@shopio.com`;
+    const user = {
+      id: `u_${cleanPhone}`,
+      name: userName,
+      phone: cleanPhone,
+      email: userEmail,
+      role: 'customer',
+      status: 'active',
+    };
+
+    return {
+      success: true,
+      isNewUser: Boolean(name),
+      message: name ? 'Registration successfully completed' : 'Login successful',
+      user,
+      smsNotification: {
+        recipient: cleanPhone,
+        message: `प्रिय ${userName}, Shopio मध्ये आपले सहर्ष स्वागत आहे! आपले रजिस्ट्रेशन यशस्वीरित्या पूर्ण झाले आहे. पहिल्या खरेदीवर ₹100 सूट व 100% मोफत डिलिव्हरी उपलब्ध! 🎉🛍️`,
+      },
+    };
   },
 
   // Dashboards

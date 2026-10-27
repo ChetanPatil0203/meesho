@@ -86,4 +86,8 @@ export const orderService = {
       return false;
     }
   },
+
+  async cancelOrder(id) {
+    return await this.updateOrderStatus(id, { status: 'Cancelled', tracking_step: 0 });
+  },
 };

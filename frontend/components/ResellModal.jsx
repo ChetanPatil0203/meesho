@@ -108,7 +108,7 @@ export default function ResellModal({ isOpen, onClose, product, onShowToast }) {
           {/* Reseller Perks */}
           <div className="space-y-1.5 text-[11px] text-gray-600">
             <p className="flex items-center gap-1.5">
-              <span className="text-green-500 font-bold">✓</span> No Meesho / ShopKart logo shown on shared messages
+              <span className="text-green-500 font-bold">✓</span> No Shopio logo shown on shared messages (Your White-label)
             </p>
             <p className="flex items-center gap-1.5">
               <span className="text-green-500 font-bold">✓</span> Customer pays ₹{customerPrice}, you pocket ₹{margin} profit

@@ -1,9 +1,5 @@
 import { useState } from 'react';
 
-
-
-
-
 export default function Footer({ onNavigate }) {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
@@ -16,176 +12,213 @@ export default function Footer({ onNavigate }) {
   };
 
   return (
-    <footer className="bg-[#0F1629] text-gray-300 mt-12">
-      {/* Newsletter */}
-      <div className="border-b border-gray-800">
+    <footer className="bg-[#12071A] text-gray-300 mt-12 border-t border-purple-950">
+      {/* Newsletter / App download strip */}
+      <div className="border-b border-purple-900/40">
         <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col md:flex-row items-center justify-between gap-5">
           <div>
-            <h3 className="text-white font-bold text-lg flex items-center gap-2">
-              <span className="text-yellow-400">📬</span> Subscribe for Exclusive Deals
+            <h3 className="text-white font-black text-lg flex items-center gap-2">
+              <span className="text-yellow-400">🛍️</span> Shop on Shopio & Get Lowest Prices
             </h3>
-            <p className="text-gray-400 text-sm mt-0.5">Get weekly offers, flash sale alerts & new arrivals in your inbox</p>
+            <p className="text-gray-400 text-xs sm:text-sm mt-0.5">
+              Subscribe to get exclusive WhatsApp deals, mega festival sales, and new supplier stock alerts
+            </p>
           </div>
-          {subscribed ?
-          <div className="flex items-center gap-2 text-green-400 font-semibold bg-green-900/30 px-5 py-2.5 rounded-xl border border-green-800">
-              <span>✓</span> You're subscribed!
-            </div> :
-
-          <div className="flex gap-2 w-full md:w-auto">
+          {subscribed ? (
+            <div className="flex items-center gap-2 text-green-400 font-bold bg-green-900/30 px-5 py-2.5 rounded-2xl border border-green-800 text-xs">
+              <span>✓</span> You are subscribed to Shopio Alerts!
+            </div>
+          ) : (
+            <div className="flex gap-2 w-full md:w-auto">
               <input
-              type="email"
-              placeholder="Enter your email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSubscribe()}
-              className="flex-1 md:w-72 px-4 py-2.5 rounded-xl bg-gray-800 border border-gray-700 text-white text-sm focus:border-[#3B5BDB] focus:outline-none placeholder:text-gray-500" />
-            
-              <button onClick={handleSubscribe}
-            className="px-5 py-2.5 bg-[#3B5BDB] text-white rounded-xl text-sm font-semibold hover:bg-[#2F4AC4] transition-colors whitespace-nowrap active:scale-95">
+                type="email"
+                placeholder="Enter your email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSubscribe()}
+                className="flex-1 md:w-72 px-4 py-2.5 rounded-2xl bg-purple-950/40 border border-purple-800/60 text-white text-xs focus:border-[#F43397] focus:outline-none placeholder:text-gray-500"
+              />
+              <button
+                onClick={handleSubscribe}
+                className="px-5 py-2.5 bg-gradient-to-r from-[#9F2089] to-[#F43397] text-white rounded-2xl text-xs font-black hover:opacity-90 transition-opacity whitespace-nowrap active:scale-95"
+              >
                 Subscribe
               </button>
             </div>
-          }
+          )}
         </div>
       </div>
 
       {/* Links grid */}
-      <div className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-2 md:grid-cols-5 gap-8">
+      <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-2 md:grid-cols-5 gap-8 text-xs">
         {/* Brand */}
         <div className="col-span-2 md:col-span-1">
-          <button onClick={() => onNavigate('home')} className="flex items-center gap-2 mb-4 group">
-            <div className="w-8 h-8 bg-[#3B5BDB] rounded-lg flex items-center justify-center">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
-                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
-                <line x1="3" y1="6" x2="21" y2="6" stroke="white" strokeWidth="2" />
-                <path d="M16 10a4 4 0 01-8 0" stroke="white" strokeWidth="2" fill="none" />
-              </svg>
+          <button onClick={() => onNavigate('home')} className="flex items-center gap-2.5 mb-4 group text-left">
+            <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-[#9F2089] to-[#F43397] flex items-center justify-center font-black text-white text-base">
+              S
             </div>
-            <span className="text-white font-extrabold text-lg">ShopKart</span>
-          </button>
-          <p className="text-gray-400 text-sm leading-relaxed mb-5">
-            India's trusted marketplace for fashion, electronics, beauty & more. Shop from 1 Crore+ products.
-          </p>
-          <div className="space-y-2 text-xs text-gray-500">
-            <div className="flex items-center gap-2"><span>📍</span> Mumbai, Maharashtra 400001</div>
-            <div className="flex items-center gap-2"><span>📞</span> 1800-123-4567 (Toll Free)</div>
-            <div className="flex items-center gap-2"><span>✉️</span> support@shopkart.in</div>
-          </div>
-          <div className="flex gap-2 mt-5">
-            {[
-            { icon: '📘', label: 'Facebook' },
-            { icon: '🐦', label: 'Twitter' },
-            { icon: '📸', label: 'Instagram' },
-            { icon: '▶', label: 'YouTube' }].
-            map((s) =>
-            <button key={s.label} title={s.label}
-            className="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-[#3B5BDB] transition-colors text-sm">
-                {s.icon}
-              </button>
-            )}
-          </div>
-        </div>
-
-        {[
-        {
-          title: 'Shop',
-          links: [
-          { label: 'Women\'s Fashion', action: () => onNavigate('listing', { category: 'Women' }) },
-          { label: 'Men\'s Fashion', action: () => onNavigate('listing', { category: 'Men' }) },
-          { label: 'Kids', action: () => onNavigate('listing', { category: 'Kids' }) },
-          { label: 'Electronics', action: () => onNavigate('listing', { category: 'Electronics' }) },
-          { label: 'Beauty & Care', action: () => onNavigate('listing', { category: 'Beauty' }) },
-          { label: 'Sports & Fitness', action: () => onNavigate('listing', { category: 'Sports' }) }]
-
-        },
-        {
-          title: 'Customer Help',
-          links: [
-          { label: 'My Orders', action: () => onNavigate('orders') },
-          { label: 'Track Order', action: () => onNavigate('order-tracking', { orderId: 'SK123456789' }) },
-          { label: 'Returns & Refunds', action: () => onNavigate('profile') },
-          { label: 'Cancel Order', action: () => onNavigate('orders') },
-          { label: 'Contact Support', action: () => {} },
-          { label: 'FAQ', action: () => {} }]
-
-        },
-        {
-          title: 'Company',
-          links: [
-          { label: 'About ShopKart', action: () => {} },
-          { label: 'Careers', action: () => {} },
-          { label: 'Press & Media', action: () => {} },
-          { label: 'Blog', action: () => {} },
-          { label: 'Sitemap', action: () => {} },
-          { label: 'Accessibility', action: () => {} }]
-
-        },
-        {
-          title: 'Policies & Help',
-          links: [
-          { label: 'Privacy Policy', action: () => {} },
-          { label: 'Terms of Use', action: () => {} },
-          { label: 'Return Policy', action: () => {} },
-          { label: 'Security & Safety', action: () => {} },
-          { label: 'Shipping & Delivery', action: () => {} },
-          { label: 'Grievance Redressal', action: () => {} }]
-
-        }].
-        map((section) =>
-        <div key={section.title}>
-            <h4 className="text-white font-bold mb-4 text-sm">{section.title}</h4>
-            <ul className="space-y-2.5">
-              {section.links.map((link) =>
-            <li key={link.label}>
-                  <button onClick={link.action}
-              className="text-gray-400 text-sm hover:text-white transition-colors text-left">
-                    {link.label}
-                  </button>
-                </li>
-            )}
-            </ul>
-          </div>
-        )}
-      </div>
-
-      {/* Payment & Security */}
-      <div className="border-t border-gray-800 py-5">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div>
-              <p className="text-xs text-gray-500 mb-2">Accepted Payment Methods</p>
-              <div className="flex items-center gap-2 flex-wrap">
-                {['💳 Visa', '💳 Mastercard', '🏦 Net Banking', '📱 UPI', '👛 Wallets', '💵 COD'].map((method) =>
-                <span key={method} className="text-[10px] bg-gray-800 text-gray-400 px-2.5 py-1 rounded-md border border-gray-700">{method}</span>
-                )}
-              </div>
+              <span className="text-white font-black text-xl tracking-tight leading-none block">Shopio</span>
+              <span className="text-[9px] text-pink-300 font-semibold leading-none">Lowest Prices Everyday</span>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-800 px-3 py-2 rounded-lg border border-gray-700">
-                <span>🔒</span> SSL Encrypted
-              </div>
-              <div className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-800 px-3 py-2 rounded-lg border border-gray-700">
-                <span>✅</span> PCI DSS Compliant
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom bar */}
-      <div className="border-t border-gray-800 py-4 bg-black/30">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-2">
-          <p className="text-gray-600 text-xs">
-            © 2025 ShopKart Technologies Pvt. Ltd. · All rights reserved · Made with ❤️ in India
+          </button>
+          <p className="text-gray-400 leading-relaxed mb-4">
+            India's #1 reselling and shopping platform. 15 Crore+ happy shoppers, 100% Free Delivery, Cash on Delivery, and Easy 7-day Returns.
           </p>
-          <div className="flex gap-4 text-xs text-gray-600">
-            <button className="hover:text-gray-300 transition-colors">Privacy Policy</button>
-            <button className="hover:text-gray-300 transition-colors">Terms of Use</button>
-            <button className="hover:text-gray-300 transition-colors">Cookie Policy</button>
-            <button className="hover:text-gray-300 transition-colors">Grievance</button>
+          <div className="space-y-1.5 text-gray-400">
+            <div>📍 Mumbai, Maharashtra & Bangalore</div>
+            <div>📞 1800-123-6337 (Toll Free 24x7)</div>
+            <div>✉️ help@shopio.com</div>
+          </div>
+        </div>
+
+        {/* Categories */}
+        <div>
+          <h4 className="text-white font-black mb-3 text-sm">Top Categories</h4>
+          <ul className="space-y-2 text-gray-400">
+            <li>
+              <button onClick={() => onNavigate('listing', { category: 'Women' })} className="hover:text-white transition-colors">
+                Sarees & Kurtis
+              </button>
+            </li>
+            <li>
+              <button onClick={() => onNavigate('listing', { category: 'Men' })} className="hover:text-white transition-colors">
+                Men's Fashion
+              </button>
+            </li>
+            <li>
+              <button onClick={() => onNavigate('listing', { category: 'Kids' })} className="hover:text-white transition-colors">
+                Baby & Kids Wear
+              </button>
+            </li>
+            <li>
+              <button onClick={() => onNavigate('listing', { category: 'Electronics' })} className="hover:text-white transition-colors">
+                Electronics & Gadgets
+              </button>
+            </li>
+            <li>
+              <button onClick={() => onNavigate('listing', { category: 'Home & Kitchen' })} className="hover:text-white transition-colors">
+                Home & Kitchenware
+              </button>
+            </li>
+            <li>
+              <button onClick={() => onNavigate('listing', { category: 'Beauty' })} className="hover:text-white transition-colors">
+                Beauty & Personal Care
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        {/* Customer Care */}
+        <div>
+          <h4 className="text-white font-black mb-3 text-sm">Customer Care</h4>
+          <ul className="space-y-2 text-gray-400">
+            <li>
+              <button onClick={() => onNavigate('orders')} className="hover:text-white transition-colors">
+                Track My Order
+              </button>
+            </li>
+            <li>
+              <button onClick={() => onNavigate('orders')} className="hover:text-white transition-colors">
+                Returns & Refunds
+              </button>
+            </li>
+            <li>
+              <button onClick={() => onNavigate('orders')} className="hover:text-white transition-colors">
+                Cancel Order
+              </button>
+            </li>
+            <li>
+              <button onClick={() => onNavigate('profile')} className="hover:text-white transition-colors">
+                Shopio Coins Balance
+              </button>
+            </li>
+            <li>
+              <button onClick={() => onNavigate('profile')} className="hover:text-white transition-colors">
+                Help & Grievance
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        {/* Reselling & Suppliers */}
+        <div>
+          <h4 className="text-white font-black mb-3 text-sm">Earn with Shopio</h4>
+          <ul className="space-y-2 text-gray-400">
+            <li>
+              <button onClick={() => onNavigate('resell')} className="hover:text-white transition-colors">
+                Become a Reseller (Zero Cost)
+              </button>
+            </li>
+            <li>
+              <button onClick={() => onNavigate('home')} className="hover:text-white transition-colors">
+                Sell on Shopio (0% Commission)
+              </button>
+            </li>
+            <li>
+              <button onClick={() => onNavigate('home')} className="hover:text-white transition-colors">
+                Supplier Hub
+              </button>
+            </li>
+            <li>
+              <button onClick={() => onNavigate('home')} className="hover:text-white transition-colors">
+                WhatsApp Margin Tool
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        {/* Company & Legal */}
+        <div>
+          <h4 className="text-white font-black mb-3 text-sm">Policies & Trust</h4>
+          <ul className="space-y-2 text-gray-400">
+            <li>
+              <span className="hover:text-white cursor-pointer">Privacy Policy</span>
+            </li>
+            <li>
+              <span className="hover:text-white cursor-pointer">Terms of Service</span>
+            </li>
+            <li>
+              <span className="hover:text-white cursor-pointer">7-Day Return Policy</span>
+            </li>
+            <li>
+              <span className="hover:text-white cursor-pointer">Security & Protection</span>
+            </li>
+            <li>
+              <span className="hover:text-white cursor-pointer">Anti-Phishing Notice</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Payment methods strip */}
+      <div className="border-t border-purple-900/40 py-5">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4 text-xs">
+          <div className="flex items-center gap-2 flex-wrap text-gray-400">
+            <span>Accepted Payment:</span>
+            {['💵 Cash on Delivery', '📱 UPI / QR', '💳 Visa / RuPay / Mastercard', '🏦 All Major Net Banking'].map(
+              (m) => (
+                <span
+                  key={m}
+                  className="bg-purple-950/60 text-pink-200 border border-purple-800/40 px-2 py-0.5 rounded-lg text-[10px]"
+                >
+                  {m}
+                </span>
+              )
+            )}
+          </div>
+          <div className="flex items-center gap-3 text-gray-400 text-xs">
+            <span>🔒 256-Bit SSL Encrypted</span>
+            <span>•</span>
+            <span>🇮🇳 Made with ❤️ for Indian Shoppers</span>
           </div>
         </div>
       </div>
-    </footer>);
 
+      {/* Bottom Bar */}
+      <div className="border-t border-purple-900/20 py-4 bg-black/40 text-[11px] text-gray-500 text-center">
+        © 2026 Shopio Technologies Pvt. Ltd. All rights reserved.
+      </div>
+    </footer>
+  );
 }

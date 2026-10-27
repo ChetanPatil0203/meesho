@@ -1,20 +1,22 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap');
 @import 'tailwindcss';
 
 @theme inline {
-  --color-primary: #3B5BDB;
-  --color-primary-dark: #2F4AC4;
-  --color-primary-light: #EEF2FF;
-  --color-accent: #FF6B35;
-  --color-success: #22C55E;
+  --color-primary: #9F2089;
+  --color-primary-dark: #7D126C;
+  --color-primary-light: #FDF2F8;
+  --color-meesho-pink: #F43397;
+  --color-meesho-purple: #9F2089;
+  --color-accent: #FF8A00;
+  --color-success: #038D63;
   --color-warning: #F59E0B;
   --color-danger: #EF4444;
-  --color-background: #F4F5F7;
+  --color-background: #F8F9FA;
   --color-surface: #FFFFFF;
   --color-border: #E5E7EB;
-  --color-text: #1A1A2E;
-  --color-text-muted: #6B7280;
-  --color-text-light: #9CA3AF;
+  --color-text: #1E293B;
+  --color-text-muted: #64748B;
+  --color-text-light: #94A3B8;
 }
 
 * {
@@ -22,12 +24,27 @@
 }
 
 body {
-  font-family: 'Poppins', sans-serif;
-  background-color: #F4F5F7;
-  color: #1A1A2E;
+  font-family: 'Plus Jakarta Sans', 'Poppins', sans-serif;
+  background-color: #F8F9FA;
+  color: #1E293B;
   margin: 0;
   padding: 0;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ── Meesho Gradients & Utilities ── */
+.bg-meesho-gradient {
+  background: linear-gradient(135deg, #9F2089 0%, #D81B80 50%, #F43397 100%);
+}
+
+.bg-meesho-subtle {
+  background: linear-gradient(135deg, #FDF2F8 0%, #FFF5F9 100%);
+}
+
+.text-meesho-gradient {
+  background: linear-gradient(135deg, #9F2089 0%, #F43397 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* ── Dark Mode Styles ── */
@@ -116,9 +133,9 @@ html.dark textarea {
 }
 
 @keyframes pulse-ring {
-  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(59, 91, 219, 0.4); }
-  70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(59, 91, 219, 0); }
-  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(59, 91, 219, 0); }
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(159, 32, 137, 0.4); }
+  70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(159, 32, 137, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(159, 32, 137, 0); }
 }
 
 @keyframes shimmer {
@@ -131,11 +148,66 @@ html.dark textarea {
   to { transform: translateY(0); opacity: 1; }
 }
 
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 15px rgba(244, 51, 151, 0.4), 0 0 30px rgba(159, 32, 137, 0.2); }
+  50% { box-shadow: 0 0 25px rgba(244, 51, 151, 0.7), 0 0 45px rgba(159, 32, 137, 0.4); }
+}
+
+@keyframes shine-diagonal {
+  0% { transform: translateX(-150%) rotate(25deg); }
+  100% { transform: translateX(250%) rotate(25deg); }
+}
+
+@keyframes wobble-gift {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(-10deg) scale(1.08); }
+  75% { transform: rotate(10deg) scale(1.08); }
+}
+
+@keyframes heart-pop {
+  0% { transform: scale(0.5); opacity: 0.8; }
+  50% { transform: scale(1.4); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
 .animate-slide-in { animation: slide-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
 .animate-fade-in { animation: fade-in 0.25s ease forwards; }
 .animate-spin { animation: spin 1s linear infinite; }
 .animate-bounce-in { animation: bounce-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
 .animate-pulse-ring { animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite; }
+.animate-float { animation: float-slow 3s ease-in-out infinite; }
+.animate-glow { animation: glow-pulse 2s ease-in-out infinite; }
+.animate-wobble { animation: wobble-gift 1.2s ease-in-out infinite; }
+.animate-heart-pop { animation: heart-pop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+.shine-effect {
+  position: relative;
+  overflow: hidden;
+}
+.shine-effect::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    60deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 70%
+  );
+  transform: translateX(-150%) rotate(25deg);
+  pointer-events: none;
+}
+.shine-effect:hover::after {
+  animation: shine-diagonal 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
 .shimmer-bg {
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
@@ -194,4 +266,85 @@ input[type='range'] {
 /* Mobile-first body bottom padding (for bottom nav) */
 @media (max-width: 768px) {
   .pb-mobile-nav { padding-bottom: 72px; }
+}
+
+/* ========================================================
+   RESPONSIVE DESIGN SYSTEM (Breakpoints: 320px, 480px, 768px, 1200px+)
+   - Mobile: 320px–480px
+   - Tablet: 481px–768px
+   - Laptop: 769px–1200px
+   - Desktop: 1201px+
+======================================================== */
+
+/* Prevent horizontal overflow globally */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+}
+
+img, video, canvas, svg {
+  max-width: 100%;
+}
+
+/* ── Mobile Specific Rules (320px – 480px) ── */
+@media (max-width: 480px) {
+  /* Ensure form controls have accessible text sizes to avoid iOS zoom */
+  input, select, textarea {
+    font-size: 14px;
+  }
+
+  /* Responsive compact paddings on small devices */
+  .mobile-container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  /* Compact button styling on ultra-small mobile */
+  .mobile-touch-btn {
+    min-height: 40px;
+  }
+
+  /* Product card mobile grid optimizations */
+  .product-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  /* Flash timer compact alignment */
+  .flash-timer-box {
+    width: 36px;
+    height: 40px;
+    font-size: 15px;
+  }
+
+  /* Category pills small footprint */
+  .category-pill-circle {
+    width: 58px;
+    height: 58px;
+  }
+}
+
+/* ── Tablet Specific Rules (481px – 768px) ── */
+@media (min-width: 481px) and (max-width: 768px) {
+  .product-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
+/* ── Laptop Specific Rules (769px – 1200px) ── */
+@media (min-width: 769px) and (max-width: 1200px) {
+  .product-card-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+/* ── Desktop Specific Rules (1201px+) ── */
+@media (min-width: 1201px) {
+  .product-card-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+  }
 }

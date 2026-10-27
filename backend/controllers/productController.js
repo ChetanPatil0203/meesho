@@ -1,6 +1,25 @@
 import { productService } from '../services/productService.js';
+import { styleRecommendationService } from '../services/styleRecommendationService.js';
 
 export const productController = {
+  // GET /api/products/style-recommendations/:id
+  async getStyleRecommendations(req, res) {
+    try {
+      const productId = req.params.id || req.params.productId;
+      const { occasion, style, budget, color } = req.query;
+      const result = await styleRecommendationService.getRecommendations({
+        productId,
+        occasion,
+        style,
+        budget,
+        color,
+      });
+      res.json(result);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  },
+
   // GET /api/products
   async getProducts(req, res) {
     try {
@@ -63,3 +82,4 @@ export const productController = {
     }
   },
 };
+

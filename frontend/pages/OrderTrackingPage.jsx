@@ -1,99 +1,195 @@
+import { useState, useEffect } from 'react';
 
+const defaultSteps = [
+  { status: 'Order Placed', time: '10:23 AM, Today', done: true, icon: '📋', desc: 'Order verified by supplier' },
+  { status: 'Packed & Processed', time: '02:15 PM, Today', done: true, icon: '📦', desc: 'Item packed in secure tamper-proof bag' },
+  { status: 'Shipped with Courier', time: 'Expected Tomorrow', done: true, icon: '🚚', desc: 'Handed over to BlueDart / Delhivery Express' },
+  { status: 'Out for Delivery', time: 'Expected by Friday', done: false, icon: '🛵', current: true, desc: 'Delivery partner will call before arrival' },
+  { status: 'Delivered', time: 'Expected by Saturday, 7:00 PM', done: false, icon: '🏠', desc: 'Package handed over at doorstep' },
+];
 
+export default function OrderTrackingPage({ orderId, onNavigate, onBack }) {
+  const [order, setOrder] = useState(null);
+  const [cancelled, setCancelled] = useState(false);
 
+  useEffect(() => {
+    try {
+      const orders = JSON.parse(localStorage.getItem('meesho_orders') || '[]');
+      const found = orders.find((o) => o.id === orderId);
+      if (found) {
+        setOrder(found);
+        if (found.status === 'Cancelled') setCancelled(true);
+      }
+    } catch {
+      // ignore
+    }
+  }, [orderId]);
 
+  const handleCancelOrder = () => {
+    if (window.confirm('Are you sure you want to cancel this order?')) {
+      setCancelled(true);
+      try {
+        const orders = JSON.parse(localStorage.getItem('meesho_orders') || '[]');
+        const updated = orders.map((o) => (o.id === orderId ? { ...o, status: 'Cancelled' } : o));
+        localStorage.setItem('meesho_orders', JSON.stringify(updated));
+      } catch {
+        // ignore
+      }
+    }
+  };
 
-const trackingSteps = [
-  { status: 'Order Placed', time: '12 Apr, 10:23 AM', done: true, icon: '📋' },
-  { status: 'Confirmed', time: '12 Apr, 10:45 AM', done: true, icon: '✅' },
-  { status: 'Packed', time: '12 Apr, 2:30 PM', done: true, icon: '📦' },
-  { status: 'Shipped', time: '13 Apr, 9:00 AM', done: true, icon: '🚚' },
-  { status: 'Out for Delivery', time: 'Expected 14 Apr', done: false, icon: '🛵', current: true },
-  { status: 'Delivered', time: 'Expected 14 Apr by 7 PM', done: false, icon: '🏠' }];
+  const steps = cancelled
+    ? [
+        { status: 'Order Placed', time: 'Completed', done: true, icon: '📋' },
+        { status: 'Order Cancelled', time: 'Just now', done: true, icon: '❌', isCancel: true },
+      ]
+    : defaultSteps;
 
-
-export default function OrderTrackingPage({ orderId, onNavigate }) {
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
+    <div className="max-w-4xl mx-auto px-4 py-8">
+      {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={() => onNavigate('orders')} className="text-gray-400 hover:text-gray-600">←</button>
+        <button
+          onClick={onBack || (() => onNavigate('orders'))}
+          title="Go Back (मागे जा)"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-[#161F30] border border-gray-200 dark:border-gray-700 text-xs font-bold text-gray-700 dark:text-gray-300 hover:text-[#9F2089] hover:border-[#9F2089] dark:hover:text-[#F43397] dark:hover:border-[#F43397] transition-all shadow-xs active:scale-95 group flex-shrink-0"
+        >
+          <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" className="group-hover:-translate-x-0.5 transition-transform">
+            <path d="M19 12H5M12 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <span>Back</span>
+        </button>
         <div>
-          <h1 className="text-xl font-bold text-gray-800">Track Order</h1>
-          <p className="text-sm text-gray-500">Order #{orderId || 'SK123456789'}</p>
+          <h1 className="text-xl font-black text-gray-900 dark:text-white">Track Order Status</h1>
+          <p className="text-xs text-gray-500">Order ID: <strong className="text-[#9F2089] dark:text-[#F43397]">#{orderId || 'MEE-789123'}</strong></p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Tracking timeline */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-          <h2 className="font-bold text-gray-800 mb-5">Delivery Status</h2>
-          <div className="relative">
-            {trackingSteps.map((step, i) =>
+        {/* Timeline */}
+        <div className="bg-white dark:bg-[#161F30] rounded-3xl shadow-xs border border-gray-100 dark:border-gray-800 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="font-black text-base text-gray-900 dark:text-white">Live Tracking</h2>
+            <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
+              cancelled ? 'bg-red-50 text-red-600' : 'bg-green-50 text-[#038D63]'
+            }`}>
+              {cancelled ? 'Cancelled' : '● On Schedule'}
+            </span>
+          </div>
+
+          <div className="relative pl-2">
+            {steps.map((step, i) => (
               <div key={step.status} className="flex gap-4 relative">
-                {/* Timeline line */}
-                {i < trackingSteps.length - 1 &&
-                  <div className={`absolute left-5 top-10 w-0.5 h-12 ${step.done ? 'bg-[#3B5BDB]' : 'bg-gray-200'}`} />
-                }
-                {/* Icon */}
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-lg z-10 ${step.done ? 'bg-[#3B5BDB]' : step.current ? 'bg-orange-100 border-2 border-orange-400' : 'bg-gray-100'}`
-                }>
-                  {step.done ? <svg width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12" /></svg> : step.icon}
+                {/* Connecting line */}
+                {i < steps.length - 1 && (
+                  <div
+                    className={`absolute left-5 top-10 w-0.5 h-14 ${
+                      step.done ? 'bg-[#9F2089]' : 'bg-gray-200 dark:bg-gray-700'
+                    }`}
+                  />
+                )}
+
+                {/* Circle Icon */}
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-base z-10 transition-all ${
+                    step.isCancel
+                      ? 'bg-red-500 text-white'
+                      : step.done
+                      ? 'bg-[#9F2089] text-white shadow-xs'
+                      : step.current
+                      ? 'bg-pink-100 dark:bg-gray-700 border-2 border-[#9F2089]'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-400'
+                  }`}
+                >
+                  {step.done && !step.isCancel ? (
+                    <svg width="16" height="16" fill="none" stroke="white" strokeWidth="3" viewBox="0 0 24 24">
+                      <polyline points="20,6 9,17 4,12" />
+                    </svg>
+                  ) : (
+                    step.icon
+                  )}
                 </div>
+
                 {/* Content */}
-                <div className="pb-10">
-                  <p className={`font-semibold text-sm ${step.done ? 'text-gray-800' : step.current ? 'text-orange-600' : 'text-gray-400'}`}>
+                <div className="pb-8">
+                  <p
+                    className={`font-bold text-xs ${
+                      step.isCancel
+                        ? 'text-red-600'
+                        : step.done
+                        ? 'text-gray-900 dark:text-white'
+                        : step.current
+                        ? 'text-[#9F2089] dark:text-[#F43397]'
+                        : 'text-gray-400'
+                    }`}
+                  >
                     {step.status}
-                    {step.current && <span className="ml-2 text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">In Progress</span>}
+                    {step.current && (
+                      <span className="ml-2 text-[10px] bg-pink-50 text-[#9F2089] px-2 py-0.5 rounded-full font-bold">
+                        In Transit
+                      </span>
+                    )}
                   </p>
-                  <p className={`text-xs mt-0.5 ${step.done ? 'text-gray-400' : 'text-gray-300'}`}>{step.time}</p>
+                  <p className="text-[11px] text-gray-400 mt-0.5">{step.time}</p>
+                  {step.desc && <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">{step.desc}</p>}
                 </div>
               </div>
-            )}
+            ))}
           </div>
+
+          {!cancelled && (
+            <div className="pt-4 border-t border-gray-100 dark:border-gray-800">
+              <button
+                onClick={handleCancelOrder}
+                className="w-full py-2.5 border border-red-200 text-red-600 rounded-xl text-xs font-bold hover:bg-red-50 transition-colors"
+              >
+                Cancel this Order
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* Order & delivery info */}
+        {/* Courier & Delivery Info */}
         <div className="space-y-4">
-          {/* Delivery partner */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-            <h3 className="font-bold text-gray-800 mb-3">Delivery Partner</h3>
+          {/* Delivery Partner */}
+          <div className="bg-white dark:bg-[#161F30] rounded-3xl shadow-xs border border-gray-100 dark:border-gray-800 p-5">
+            <h3 className="font-bold text-xs uppercase tracking-wider text-gray-400 mb-3">Courier Partner</h3>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-semibold text-gray-800">BlueDart</p>
-                <p className="text-sm text-gray-500 mt-0.5">Tracking: BD-9876543210</p>
+                <p className="font-bold text-sm text-gray-800 dark:text-gray-100">BlueDart Express (Air)</p>
+                <p className="text-xs text-gray-400 mt-0.5">AWB: BD-8492048192</p>
               </div>
-              <button className="text-[#3B5BDB] text-sm font-semibold border border-[#3B5BDB] px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors">Contact</button>
+              <span className="text-xs bg-green-50 text-[#038D63] font-bold px-2.5 py-1 rounded-xl">
+                Verified Delivery
+              </span>
             </div>
           </div>
 
-          {/* Order details */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-            <h3 className="font-bold text-gray-800 mb-3">Order Details</h3>
-            <div className="flex gap-3">
-              <div className="w-14 h-16 rounded-lg overflow-hidden bg-gray-50 flex-shrink-0">
-                <img src="https://images.unsplash.com/photo-1583391733981-8498401ef4d8?w=120&h=140&fit=crop&auto=format" alt="" className="w-full h-full object-cover" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-800">Women's Rayon Kurti - Floral Print</p>
-                <p className="text-xs text-gray-400 mt-0.5">Color: Pink · Size: M · Qty: 1</p>
-                <p className="text-sm font-bold mt-1">₹599</p>
-              </div>
+          {/* Delivery Address */}
+          <div className="bg-white dark:bg-[#161F30] rounded-3xl shadow-xs border border-gray-100 dark:border-gray-800 p-5">
+            <h3 className="font-bold text-xs uppercase tracking-wider text-gray-400 mb-3">Shipping Address</h3>
+            <p className="font-bold text-sm text-gray-800 dark:text-gray-100">{order?.address?.name || 'Chetan Pazi'}</p>
+            <p className="text-xs text-gray-500 leading-relaxed mt-1">
+              {order?.address?.address || 'Flat 402, Sai Shraddha Residency, Near Shivaji Park, Mumbai, Maharashtra - 400028'}
+            </p>
+            <p className="text-xs text-gray-400 mt-1">📞 {order?.address?.phone || '+91 9876543210'}</p>
+          </div>
+
+          {/* Help button */}
+          <div className="bg-pink-50 dark:bg-gray-800 p-4 rounded-2xl flex items-center justify-between">
+            <div className="text-xs">
+              <p className="font-bold text-[#9F2089] dark:text-[#F43397]">Need Help with this Order?</p>
+              <p className="text-gray-500 dark:text-gray-400">Available 24x7 via chat and phone</p>
             </div>
+            <button
+              onClick={() => alert('Shopio Customer Support: Toll Free 1800-123-6337\nEmail: support@shopio.com')}
+              className="px-3.5 py-2 bg-[#9F2089] text-white text-xs font-bold rounded-xl"
+            >
+              Contact Support
+            </button>
           </div>
-
-          {/* Delivery address */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-            <h3 className="font-bold text-gray-800 mb-3">Delivery Address</h3>
-            <p className="text-sm font-semibold text-gray-800">Chetan Pazi</p>
-            <p className="text-sm text-gray-500 mt-0.5">204, Park Avenue, Andheri West<br />Mumbai, Maharashtra - 400053</p>
-            <p className="text-sm text-gray-500 mt-0.5">📞 +91 9876543210</p>
-          </div>
-
-          <button className="w-full py-3 bg-gray-50 border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-100 transition-colors text-sm">
-            Contact Support
-          </button>
         </div>
       </div>
-    </div>);
-
+    </div>
+  );
 }
