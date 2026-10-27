@@ -9,7 +9,10 @@ import { fileURLToPath } from 'node:url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // Standard React + Vite configuration
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
+  define: {
+    'import.meta.env.VITE_DEFAULT_PORTAL': JSON.stringify(mode === 'admin' ? 'admin' : ''),
+  },
   plugins: [
     react(),
     tailwindcss(),
@@ -17,6 +20,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './frontend'),
+      '@admin': path.resolve(__dirname, './admin'),
     },
   },
   server: {
@@ -32,4 +36,12 @@ export default defineConfig({
   preview: {
     port: 5173,
   },
-})
+  build: {
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+        admin: path.resolve(__dirname, 'admin/index.html'),
+      },
+    },
+  },
+}))

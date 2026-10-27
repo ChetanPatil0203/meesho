@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently -n \"CLIENT,SERVER\" -c \"cyan,magenta\" \"npm run dev:client\" \"npm run dev:server\"",
+    "dev:admin": "concurrently -n \"CLIENT,SERVER\" -c \"cyan,magenta\" \"vite --host --mode admin\" \"npm run dev:server\"",
     "dev:client": "vite --host",
     "dev:server": "nodemon backend/index.js",
     "start": "node backend/index.js",
@@ -13,9 +14,11 @@
     "db:init": "node backend/database/initDb.js"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.3",
     "lucide-react": "^1.47.0",
     "mysql2": "^3.12.0",
     "react": "^19.0.0",

@@ -14,13 +14,11 @@ import WishlistPage from './pages/WishlistPage';
 import ResellPage from './pages/ResellPage';
 import Toast from './components/Toast';
 import SpinWheelModal from './components/SpinWheelModal';
-import AiChatModal from './components/AiChatModal';
-import LiveSalesNotification from './components/LiveSalesNotification';
 import FloatingWidgets from './components/FloatingWidgets';
 import VideoReelsModal from './components/VideoReelsModal';
 import CustomerLoginPage from './pages/CustomerLoginPage';
-import ShopioAdminPortal from './pages/ShopioAdminPortal';
-import adminService from './services/adminService';
+import ShopioAdminPortal from '@admin/AdminPortal';
+import adminService from '@admin/adminService';
 import { triggerConfetti } from './utils/confetti';
 import AuthModal from './components/AuthModal';
 import { IncomingOtpBanner, RegistrationSuccessSmsModal } from './components/SmsNotificationBanner';
@@ -33,17 +31,65 @@ const noFooterPages = ['portal', 'login', 'checkout', 'order-success', 'admin', 
 export default function App() {
   const [nav, setNav] = useState(() => {
     try {
-      const hash = window.location.hash.replace('#', '');
-      if (hash === 'admin' || hash === 'admin-web') return { page: 'admin' };
-      if (hash === 'login') return { page: 'login' };
-      if (hash === 'home') return { page: 'home' };
-      if (hash === 'portal') return { page: 'home' };
+      const hash = window.location.hash.replace('#', '').toLowerCase();
+      const path = window.location.pathname.replace(/^\//, '').toLowerCase();
+      const search = new URLSearchParams(window.location.search);
+      const isDefaultAdmin = import.meta.env.VITE_DEFAULT_PORTAL === 'admin';
+
+      if (
+        hash === 'admin' ||
+        hash === 'admin-web' ||
+        path === 'admin' ||
+        path === 'admin-web' ||
+        search.has('admin') ||
+        search.get('panel') === 'admin' ||
+        isDefaultAdmin
+      ) {
+        return { page: 'admin' };
+      }
+      if (hash === 'login' || path === 'login') return { page: 'login' };
+      if (hash === 'home' || path === 'home') return { page: 'home' };
       if (hash && hash !== '') return { page: hash };
+      if (path && path !== '') return { page: path };
     } catch {
       // ignore
     }
     return { page: 'home' };
   });
+
+  // Listen for hash / URL changes (e.g. typing #admin in URL bar)
+  useEffect(() => {
+    const handleLocationChange = () => {
+      try {
+        const hash = window.location.hash.replace('#', '').toLowerCase();
+        const path = window.location.pathname.replace(/^\//, '').toLowerCase();
+        const search = new URLSearchParams(window.location.search);
+        if (
+          hash === 'admin' ||
+          hash === 'admin-web' ||
+          path === 'admin' ||
+          path === 'admin-web' ||
+          search.has('admin') ||
+          search.get('panel') === 'admin'
+        ) {
+          setNav({ page: 'admin' });
+        } else if (hash === 'home' || path === 'home' || hash === '') {
+          setNav({ page: 'home' });
+        } else if (hash && hash !== '') {
+          setNav({ page: hash });
+        }
+      } catch {
+        // ignore
+      }
+    };
+
+    window.addEventListener('hashchange', handleLocationChange);
+    window.addEventListener('popstate', handleLocationChange);
+    return () => {
+      window.removeEventListener('hashchange', handleLocationChange);
+      window.removeEventListener('popstate', handleLocationChange);
+    };
+  }, []);
   const [navHistory, setNavHistory] = useState([]);
   const [cartItems, setCartItems] = useState([]);
   const [wishlist, setWishlist] = useState(['p1', 'p4']);
@@ -556,8 +602,6 @@ export default function App() {
               />
             </>
           )}
-
-          <LiveSalesNotification onNavigate={navigate} />
 
           <VideoReelsModal
             isOpen={reelsModal.open}

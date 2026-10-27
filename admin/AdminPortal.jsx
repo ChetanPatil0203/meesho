@@ -1,4 +1,56 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import {
+  LayoutDashboard,
+  Users,
+  Store,
+  Package,
+  Tags,
+  ShoppingBag,
+  CreditCard,
+  RotateCcw,
+  Star,
+  TicketPercent,
+  ShieldCheck,
+  AlertTriangle,
+  Bell,
+  BarChart3,
+  Settings,
+  Search,
+  X,
+  Menu,
+  LogOut,
+  Crown,
+  Eye,
+  EyeOff,
+  Plus,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+  Clock,
+  ArrowUpRight,
+  ArrowDownRight,
+  ExternalLink,
+  Filter,
+  Download,
+  Building2,
+  RefreshCw,
+  Send,
+  Lock,
+  KeyRound,
+  Check,
+  Truck,
+  IndianRupee,
+  MessageSquare,
+  Activity,
+  Home,
+  ChevronRight,
+  ChevronDown,
+  Sparkles,
+  SlidersHorizontal,
+  UserPlus,
+  FolderPlus,
+  ChevronLeft
+} from 'lucide-react';
 import {
   AreaChart,
   Area,
@@ -14,7 +66,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
-import adminService from '../services/adminService';
+import adminService from './adminService';
 
 // Sample mock analytics charts data
 const salesOverviewData = [
@@ -526,6 +578,91 @@ const ROLE_PERMISSIONS_MATRIX = {
   },
 };
 
+
+// Lightweight SVG Sparkline component for KPI cards
+function Sparkline({ data, color = '#F43397', height = 32, width = 74 }) {
+  if (!data || data.length < 2) return null;
+  const min = Math.min(...data);
+  const max = Math.max(...data);
+  const range = max - min || 1;
+  const points = data
+    .map((val, idx) => {
+      const x = (idx / (data.length - 1)) * (width - 4) + 2;
+      const y = height - ((val - min) / range) * (height - 8) - 4;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(' ');
+
+  return (
+    <svg width={width} height={height} className="overflow-visible shrink-0">
+      <polyline
+        fill="none"
+        stroke={color}
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        points={points}
+      />
+    </svg>
+  );
+}
+
+// Sparkline series for the 8 KPI cards
+const KPI_SPARKLINES = {
+  users: [11200, 11800, 12400, 12900, 13400, 14100, 14892],
+  sellers: [620, 680, 710, 740, 790, 815, 842],
+  products: [2800, 2950, 3100, 3280, 3420, 3540, 3620],
+  orders: [1020, 1140, 1210, 1280, 1340, 1410, 1480],
+  revenue: [28000, 31000, 34000, 37000, 39500, 41200, 42856],
+  pendingOrders: [38, 34, 32, 35, 30, 29, 28],
+  pendingKyc: [22, 19, 18, 16, 17, 15, 14],
+  pendingComplaints: [12, 10, 11, 9, 8, 8, 7],
+};
+
+// 12-Month Sales & Revenue Data matching screenshot (Jan - Dec)
+const TWELVE_MONTH_SALES_DATA = [
+  { month: 'Jan', revenue: 24000, profit: 8000 },
+  { month: 'Feb', revenue: 29000, profit: 11000 },
+  { month: 'Mar', revenue: 27000, profit: 9800 },
+  { month: 'Apr', revenue: 33000, profit: 13500 },
+  { month: 'May', revenue: 39000, profit: 16800 },
+  { month: 'Jun', revenue: 46000, profit: 19500 },
+  { month: 'Jul', revenue: 53000, profit: 24500 },
+  { month: 'Aug', revenue: 61000, profit: 28500 },
+  { month: 'Sep', revenue: 70000, profit: 34000 },
+  { month: 'Oct', revenue: 79000, profit: 41000 },
+  { month: 'Nov', revenue: 89000, profit: 48500 },
+  { month: 'Dec', revenue: 98000, profit: 54000 },
+];
+
+// Top sales categories matching screenshot
+const CATEGORY_DISTRIBUTION_CHART = [
+  { name: 'Fashion', value: 34, color: '#9F2089' },
+  { name: 'Electronics', value: 22, color: '#F43397' },
+  { name: 'Home & Living', value: 18, color: '#0284C7' },
+  { name: 'Beauty & Health', value: 12, color: '#10B981' },
+  { name: 'Sports', value: 8, color: '#F59E0B' },
+  { name: 'Others', value: 6, color: '#8B5CF6' },
+];
+
+// Top Selling Products matching screenshot
+const TOP_SELLING_PRODUCTS = [
+  { id: 'p1', name: "Men's Casual Shirt", category: 'Men Fashion', sold: 482, revenue: '₹2,89,200', icon: '👔' },
+  { id: 'p2', name: 'Wireless Earbuds', category: 'Electronics', sold: 356, revenue: '₹2,13,400', icon: '🎧' },
+  { id: 'p3', name: 'Smart Watch', category: 'Electronics', sold: 279, revenue: '₹1,96,500', icon: '⌚' },
+  { id: 'p4', name: "Women's Handbag", category: 'Western Wear', sold: 243, revenue: '₹1,82,600', icon: '👜' },
+  { id: 'p5', name: 'Sports Shoes', category: 'Footwear', sold: 198, revenue: '₹1,45,200', icon: '👟' },
+];
+
+// Recent Activity Stream matching screenshot
+const RECENT_ACTIVITIES = [
+  { id: 'a1', title: 'New seller registered', desc: 'Rahul Traders (KYC Pending)', time: '2 hours ago', icon: Store, iconBg: 'bg-pink-50 text-[#F43397]' },
+  { id: 'a2', title: 'Order #ORD-1023 status updated', desc: 'Processing ➔ Shipped', time: '3 hours ago', icon: Package, iconBg: 'bg-purple-50 text-purple-600' },
+  { id: 'a3', title: 'New product added', desc: 'Wireless Earbuds', time: '5 hours ago', icon: Plus, iconBg: 'bg-blue-50 text-blue-600' },
+  { id: 'a4', title: 'Complaint raised', desc: 'Order #ORD-1019 - Product damaged', time: '6 hours ago', icon: AlertCircle, iconBg: 'bg-amber-50 text-amber-600' },
+  { id: 'a5', title: 'Admin updated category', desc: 'Electronics', time: '8 hours ago', icon: Settings, iconBg: 'bg-emerald-50 text-emerald-600' },
+];
+
 export default function ShopioAdminPortal({
   onNavigate,
   onShowToast,
@@ -549,6 +686,8 @@ export default function ShopioAdminPortal({
 
   // Mobile sidebar drawer state
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [analyticsTimeframe, setAnalyticsTimeframe] = useState('year');
 
   // Admin Login Form State
   const [loginEmail, setLoginEmail] = useState('admin@shopio.com');
@@ -659,6 +798,7 @@ export default function ShopioAdminPortal({
   };
 
   // Admin Logout
+  const handleLogout = () => handleAdminLogout();
   const handleAdminLogout = () => {
     sessionStorage.removeItem('shopio_admin_user');
     localStorage.removeItem('shopio_admin_user');
@@ -749,42 +889,36 @@ export default function ShopioAdminPortal({
   // =========================================================================
   if (!adminUser) {
     return (
-      <div className="min-h-screen bg-[#0B0F19] text-slate-100 flex flex-col font-sans relative selection:bg-[#F43397] selection:text-white">
+      <div className="min-h-screen bg-[#F8F9FA] text-slate-900 flex flex-col font-sans relative selection:bg-[#F43397] selection:text-white">
         {/* Subtle background grid pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b15_1px,transparent_1px),linear-gradient(to_bottom,#1e293b15_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
 
         {/* Top Minimal Brand Bar */}
-        <header className="relative z-10 w-full border-b border-[#27354A] bg-[#161F30]/60 backdrop-blur-md py-4 px-6">
+        <header className="relative z-10 w-full border-b border-slate-100 bg-white/80 backdrop-blur-md py-4 px-6">
           <div className="max-w-6xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#9F2089] via-[#D81B80] to-[#F43397] flex items-center justify-center text-white font-black text-xl shadow-lg shadow-pink-500/25">
                 S
               </div>
               <div>
-                <span className="font-black text-xl tracking-tight text-white flex items-center gap-1.5">
+                <span className="font-black text-xl tracking-tight text-slate-900 flex items-center gap-1.5">
                   Shopio <span className="w-1.5 h-1.5 rounded-full bg-[#F43397] inline-block mr-1"></span><span className="text-xs px-2 py-0.5 rounded-md bg-[#F43397]/20 text-[#F43397] border border-[#F43397]/30 uppercase tracking-wider font-extrabold">Admin</span>
                 </span>
-                <p className="text-[10px] text-slate-400 font-medium">Enterprise Management Portal</p>
+                <p className="text-[10px] text-gray-500 font-medium">Enterprise Management Portal</p>
               </div>
             </div>
 
-            <button
-              onClick={() => onNavigate?.('home')}
-              className="text-xs font-bold text-slate-400 hover:text-white py-1.5 px-3 rounded-xl hover:bg-[#1E293B] transition-colors flex items-center gap-1.5"
-            >
-              <span>← Customer Store</span>
-            </button>
           </div>
         </header>
 
         {/* Center Admin Login Card */}
         <main className="relative z-10 flex-1 flex items-center justify-center p-4 sm:p-8">
-          <div className="w-full max-w-md bg-[#161F30]/90 rounded-3xl border border-[#27354A] shadow-2xl shadow-pink-950/40 p-6 sm:p-8 backdrop-blur-xl">
+          <div className="w-full max-w-md bg-white/95 rounded-3xl border border-slate-200 shadow-2xl shadow-pink-950/40 p-6 sm:p-8 backdrop-blur-xl">
             <div className="text-center mb-6">
-              <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-[#9F2089] via-[#D81B80] to-[#F43397] flex items-center justify-center text-2xl shadow-xl shadow-pink-600/30 mb-3">
-                🛡️
+              <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-[#9F2089] via-[#D81B80] to-[#F43397] flex items-center justify-center text-white shadow-xl shadow-pink-600/30 mb-3">
+                <ShieldCheck className="w-7 h-7" />
               </div>
-              <h1 className="text-2xl font-black text-white tracking-tight flex items-center justify-center gap-1">
+              <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center justify-center gap-1">
                 <span>Shopio</span>
                 <span className="w-2 h-2 rounded-full bg-[#F43397] inline-block"></span>
                 <span className="text-lg font-black text-[#F43397] ml-1">Admin</span>
@@ -803,7 +937,7 @@ export default function ShopioAdminPortal({
 
             <form onSubmit={handleAdminLogin} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1.5">
+                <label className="block text-xs font-bold text-gray-700 mb-1.5">
                   Email / Admin ID
                 </label>
                 <input
@@ -815,13 +949,13 @@ export default function ShopioAdminPortal({
                   }}
                   placeholder="admin@shopio.com"
                   required
-                  className="w-full bg-[#0B0F19] border border-[#334155] rounded-2xl px-4 py-3 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#F43397] transition-colors font-mono"
+                  className="w-full bg-[#F8F9FA] border border-slate-200 rounded-2xl px-4 py-3 text-xs text-slate-900 placeholder:text-gray-400 focus:outline-none focus:border-[#F43397] transition-colors font-mono"
                 />
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-bold text-slate-300">
+                  <label className="text-xs font-bold text-gray-700">
                     Password
                   </label>
                   <button
@@ -842,15 +976,15 @@ export default function ShopioAdminPortal({
                     }}
                     placeholder="••••••••"
                     required
-                    className="w-full bg-[#0B0F19] border border-[#334155] rounded-2xl px-4 py-3 pr-11 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#F43397] transition-colors font-mono"
+                    className="w-full bg-[#F8F9FA] border border-slate-200 rounded-2xl px-4 py-3 pr-11 text-xs text-slate-900 placeholder:text-gray-400 focus:outline-none focus:border-[#F43397] transition-colors font-mono"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 text-slate-400 hover:text-white text-xs cursor-pointer p-1"
+                    className="absolute right-3 text-gray-500 hover:text-white text-xs cursor-pointer p-1"
                     title={showPassword ? 'Hide password' : 'Show password'}
                   >
-                    {showPassword ? '👁️' : '🙈'}
+                    {showPassword ? <EyeOff className="w-4 h-4 text-gray-500" /> : <Eye className="w-4 h-4 text-gray-500" />}
                   </button>
                 </div>
               </div>
@@ -862,9 +996,9 @@ export default function ShopioAdminPortal({
                   id="rememberMe"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="rounded border-[#334155] bg-[#0B0F19] text-[#F43397] focus:ring-[#F43397] h-4 w-4 cursor-pointer"
+                  className="rounded border-gray-200 bg-[#F8F9FA] text-[#F43397] focus:ring-[#F43397] h-4 w-4 cursor-pointer"
                 />
-                <label htmlFor="rememberMe" className="text-xs text-slate-300 cursor-pointer select-none">
+                <label htmlFor="rememberMe" className="text-xs text-gray-700 cursor-pointer select-none">
                   Remember Me on this device
                 </label>
               </div>
@@ -883,26 +1017,26 @@ export default function ShopioAdminPortal({
             </form>
 
             {/* Quick Demo Credentials for Testing */}
-            <div className="mt-6 pt-5 border-t border-[#27354A]">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2.5 text-center">
+            <div className="mt-6 pt-5 border-t border-gray-200">
+              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2.5 text-center">
                 Quick Demo Accounts (1-Click Fill)
               </p>
               <div className="grid grid-cols-2 gap-2 text-[11px]">
                 <button
                   type="button"
                   onClick={() => handleQuickDemoLogin('admin@shopio.com', 'Super Admin')}
-                  className="p-2 rounded-xl bg-[#1E293B]/80 hover:bg-[#1E293B] border border-[#334155] text-left text-pink-300 font-semibold transition-colors cursor-pointer"
+                  className="p-2 rounded-xl bg-gray-50 hover:bg-gray-50 border border-slate-200 text-left text-pink-300 font-semibold transition-colors cursor-pointer"
                 >
-                  <p className="font-bold text-white">👑 Super Admin</p>
-                  <p className="text-[10px] text-slate-400">admin@shopio.com</p>
+                  <p className="font-bold text-slate-900">Super Admin</p>
+                  <p className="text-[10px] text-gray-500">admin@shopio.com</p>
                 </button>
                 <button
                   type="button"
                   onClick={() => handleQuickDemoLogin('orderadmin@shopio.com', 'Order Admin')}
-                  className="p-2 rounded-xl bg-[#1E293B]/80 hover:bg-[#1E293B] border border-[#334155] text-left text-emerald-300 font-semibold transition-colors cursor-pointer"
+                  className="p-2 rounded-xl bg-gray-50 hover:bg-gray-50 border border-slate-200 text-left text-emerald-300 font-semibold transition-colors cursor-pointer"
                 >
-                  <p className="font-bold text-white">📦 Order Admin</p>
-                  <p className="text-[10px] text-slate-400">orderadmin@shopio.com</p>
+                  <p className="font-bold text-slate-900">Order Admin</p>
+                  <p className="text-[10px] text-gray-500">orderadmin@shopio.com</p>
                 </button>
               </div>
             </div>
@@ -912,12 +1046,12 @@ export default function ShopioAdminPortal({
         {/* Forgot Password Helper Modal */}
         {showForgotModal && (
           <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-[#161F30] border border-[#27354A] rounded-3xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl">
+            <div className="bg-white border border-slate-200 rounded-3xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl">
               <div className="w-12 h-12 mx-auto rounded-full bg-[#F43397]/20 text-[#F43397] flex items-center justify-center text-xl">
                 🔑
               </div>
-              <h3 className="font-black text-lg text-white">Admin Credentials Reset</h3>
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <h3 className="font-black text-lg text-slate-900">Admin Credentials Reset</h3>
+              <p className="text-xs text-gray-700 leading-relaxed">
                 For administrative security, default credentials are initialized:
                 <br />
                 Email: <strong className="text-[#F43397] font-mono">admin@shopio.com</strong>
@@ -941,73 +1075,180 @@ export default function ShopioAdminPortal({
   // VIEW 2: AUTHENTICATED ADMIN WEB DASHBOARD (With all 15 sections)
   // =========================================================================
   const sidebarItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-    { id: 'users', label: 'Users', icon: '👥', badge: users.length },
-    { id: 'sellers', label: 'Sellers', icon: '💼', badge: sellers.length },
-    { id: 'products', label: 'Products', icon: '📦', badge: '3.6k' },
-    { id: 'categories', label: 'Categories', icon: '🏷️' },
-    { id: 'orders', label: 'Orders', icon: '🛍️', badge: '1.4k' },
-    { id: 'payments', label: 'Payments', icon: '💳' },
-    { id: 'returns', label: 'Returns & Refunds', icon: '🔄', badge: '3' },
-    { id: 'reviews', label: 'Reviews', icon: '⭐' },
-    { id: 'coupons', label: 'Coupons & Offers', icon: '🎁' },
-    { id: 'kyc', label: 'KYC Verification', icon: '🛡️', badge: '14' },
-    { id: 'complaints', label: 'Complaints', icon: '⚠️', badge: '7' },
-    { id: 'notifications', label: 'Notifications', icon: '🔔' },
-    { id: 'analytics', label: 'Analytics', icon: '📈' },
-    { id: 'settings', label: 'Settings', icon: '⚙️' },
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'users', label: 'Users', icon: Users, badge: users.length },
+    { id: 'sellers', label: 'Sellers', icon: Store, badge: sellers.length },
+    { id: 'products', label: 'Products', icon: Package, badge: '3.6k' },
+    { id: 'categories', label: 'Categories', icon: Tags },
+    { id: 'orders', label: 'Orders', icon: ShoppingBag, badge: '1.4k' },
+    { id: 'payments', label: 'Payments', icon: CreditCard },
+    { id: 'returns', label: 'Returns & Refunds', icon: RotateCcw, badge: '3' },
+    { id: 'reviews', label: 'Reviews', icon: Star },
+    { id: 'coupons', label: 'Coupons & Offers', icon: TicketPercent },
+    { id: 'kyc', label: 'KYC Verification', icon: ShieldCheck, badge: '14' },
+    { id: 'complaints', label: 'Complaints', icon: AlertTriangle, badge: '7' },
+    { id: 'notifications', label: 'Notifications', icon: Bell },
+    { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+    { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
-  return (
-    <div className="min-h-screen bg-[#0B0F19] text-slate-100 flex flex-col font-sans selection:bg-[#F43397] selection:text-white">
-      {/* ── Top Bar ── */}
-      <header className="sticky top-0 z-40 bg-[#161F30]/95 backdrop-blur-md border-b border-[#27354A] shadow-md">
-        <div className="w-full px-4 sm:px-6 h-18 flex items-center justify-between gap-4">
-          {/* Mobile Hamburger + Logo & Portal Title */}
-          <div className="flex items-center gap-3 shrink-0">
-            {/* Hamburger button for Mobile / Small screens */}
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden p-2 rounded-xl bg-[#1E293B] hover:bg-slate-700 text-slate-200 border border-[#334155] transition-colors"
-              title="Toggle Navigation Menu"
-            >
-              <span className="text-lg leading-none">☰</span>
-            </button>
+    return (
+    <div className="h-screen w-screen overflow-hidden bg-[#F8FAFC] text-[#0F172A] flex font-sans antialiased selection:bg-[#F43397] selection:text-white">
+      {/* Mobile Backdrop Overlay */}
+      {sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-40 lg:hidden"
+        />
+      )}
 
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#9F2089] via-[#D81B80] to-[#F43397] flex items-center justify-center text-white font-black text-xl shadow-lg shadow-pink-500/25">
+      {/* ── 1. LEFT-SIDE NAVIGATION BAR (Midnight Navy #0B132B matching screenshot) ── */}
+      <aside
+        className={`h-screen bg-[#0B132B] text-slate-300 flex flex-col shrink-0 border-r border-[#1E293B] z-50 transition-all duration-300 ${
+          sidebarCollapsed ? 'w-20' : 'w-64 sm:w-72'
+        } ${
+          sidebarOpen ? 'fixed inset-y-0 left-0 translate-x-0' : 'fixed lg:static inset-y-0 left-0 -translate-x-full lg:translate-x-0'
+        }`}
+      >
+        {/* Sidebar Brand Header */}
+        <div className="p-4 sm:p-5 flex items-center justify-between border-b border-slate-800/80 shrink-0">
+          <div className="flex items-center gap-3 overflow-hidden">
+            {/* Pink rounded square logo with 'S' */}
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#9F2089] via-[#D81B80] to-[#F43397] flex items-center justify-center text-white font-black text-xl shadow-lg shadow-pink-600/30 shrink-0">
               S
             </div>
-            <div>
+            {!sidebarCollapsed && (
               <div className="flex items-center gap-2">
-                <span className="font-extrabold text-lg text-white tracking-tight flex items-center">
-                  <span>Shopio</span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#F43397] ml-1 mr-2 inline-block"></span>
+                <span className="font-extrabold text-xl text-white tracking-tight flex items-center">
+                  Shopio<span className="w-1.5 h-1.5 rounded-full bg-[#F43397] ml-1 inline-block"></span>
                 </span>
-                <span className="px-2 py-0.5 text-[10px] font-black uppercase tracking-wider rounded-md bg-[#F43397]/20 text-[#F43397] border border-[#F43397]/30">
-                  {adminUser.role || 'Super Admin'}
+                <span className="px-2 py-0.5 text-[9px] font-black uppercase tracking-wider rounded-md bg-[#F43397] text-white shadow-xs">
+                  SUPER ADMIN
                 </span>
               </div>
-              <p className="text-[10px] text-slate-400 font-medium hidden sm:block">
-                Master Web Dashboard · Real-Time Control
-              </p>
-            </div>
+            )}
           </div>
 
-          {/* Top Search Input */}
-          <div className="flex-1 max-w-md hidden md:block">
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Sidebar Menu Items List with Dashboard at the Top */}
+        <div className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto custom-dark-scrollbar">
+          {/* Topmost Primary Item: DASHBOARD */}
+          <button
+            onClick={() => {
+              setActiveSection('dashboard');
+              setSearchQuery('');
+              setSidebarOpen(false);
+            }}
+            title="Dashboard"
+            className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              activeSection === 'dashboard'
+                ? 'bg-[#F43397] text-white shadow-lg shadow-pink-600/30'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+            } ${sidebarCollapsed ? 'justify-center px-2' : ''}`}
+          >
+            <LayoutDashboard className="w-5 h-5 shrink-0" />
+            {!sidebarCollapsed && <span className="font-bold text-sm tracking-wide">Dashboard</span>}
+          </button>
+
+          {/* Grouping Header: MANAGEMENT MODULES */}
+          {!sidebarCollapsed && (
+            <div className="px-3 pt-4 pb-1.5 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">
+              MANAGEMENT MODULES
+            </div>
+          )}
+
+          {/* All Remaining Modules */}
+          {sidebarItems
+            .filter((item) => item.id !== 'dashboard')
+            .map((item) => {
+              const isActive = activeSection === item.id;
+              const Icon = item.icon;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    setActiveSection(item.id);
+                    setSearchQuery('');
+                    setSidebarOpen(false);
+                  }}
+                  title={item.label}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all cursor-pointer ${
+                    isActive
+                      ? 'bg-[#F43397] text-white shadow-lg shadow-pink-600/30 font-bold'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                  } ${sidebarCollapsed ? 'justify-center px-2' : ''}`}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <Icon className="w-4 h-4 shrink-0" />
+                    {!sidebarCollapsed && <span className="truncate">{item.label}</span>}
+                  </div>
+                  {!sidebarCollapsed && item.badge && (
+                    <span
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                        isActive ? 'bg-white/25 text-white' : 'bg-slate-800 text-slate-300'
+                      }`}
+                    >
+                      {item.badge}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+        </div>
+
+        {/* Sidebar Bottom Collapse Button matching screenshot */}
+        <div className="p-3 border-t border-slate-800/80 flex items-center justify-between shrink-0 bg-[#0B132B]">
+          <button
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-xs"
+            title={sidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
+          >
+            {sidebarCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+          </button>
+
+          {!sidebarCollapsed && (
+            <span className="text-[10px] text-slate-500 font-medium">
+              Shopio v2.4 Enterprise
+            </span>
+          )}
+        </div>
+      </aside>
+
+      {/* ── 2. RIGHT-SIDE MAIN AREA (Top Header + Dynamic Content Canvas) ── */}
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
+        {/* Top Header Bar (Pinned, Always Visible) */}
+        <header className="shrink-0 bg-white border-b border-slate-100 shadow-[0_1px_3px_rgba(0,0,0,0.02)] px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4 z-40">
+          {/* Mobile Menu Toggle Button */}
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="lg:hidden p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 transition-colors"
+            title="Toggle Menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+
+          {/* Global Search Input Pill */}
+          <div className="flex-1 max-w-md">
             <div className="relative">
+              <Search className="w-4 h-4 absolute left-3.5 top-2.5 text-slate-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search users, sellers, products, order IDs..."
-                className="w-full bg-[#0B0F19]/80 border border-[#334155]/80 rounded-2xl pl-10 pr-4 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#F43397]"
+                className="w-full bg-slate-50/80 border border-slate-200/90 rounded-full pl-9 pr-8 py-2 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F43397]/20 focus:border-[#F43397] transition-all"
               />
-              <span className="absolute left-3.5 top-2.5 text-xs text-slate-400">🔍</span>
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-2.5 text-xs text-slate-400 hover:text-white"
+                  className="absolute right-3 top-2.5 text-xs text-slate-400 hover:text-slate-600"
                 >
                   ✕
                 </button>
@@ -1015,413 +1256,456 @@ export default function ShopioAdminPortal({
             </div>
           </div>
 
-          {/* Top Actions: Back to Store, Notifications, Profile, Logout */}
+          {/* Top Actions: Notifications, Admin Profile, Logout */}
           <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
-            {/* Quick Customer Store Link */}
-            <button
-              onClick={() => onNavigate?.('home')}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#1E293B] hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold border border-[#334155] transition-colors"
-              title="Go to Customer Store"
-            >
-              <span>🛍️</span>
-              <span>Customer Store</span>
-            </button>
 
-            {/* Notifications Bell */}
+            {/* Notifications Bell with Pill Badge */}
             <div className="relative">
               <button
                 onClick={() => {
                   setNotificationsOpen(!notificationsOpen);
                   setUnreadNotifications(0);
                 }}
-                className="p-2.5 rounded-xl bg-[#1E293B] hover:bg-slate-700 text-slate-200 border border-[#334155] transition-colors relative cursor-pointer"
+                className="p-2 rounded-full hover:bg-slate-100 text-slate-600 transition-colors relative cursor-pointer"
                 title="Notifications"
               >
-                <span>🔔</span>
+                <Bell className="w-4 h-4" />
                 {unreadNotifications > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
+                  <span className="absolute top-0.5 right-0.5 bg-[#F43397] text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center ring-2 ring-white">
                     {unreadNotifications}
                   </span>
                 )}
               </button>
 
               {notificationsOpen && (
-                <div className="absolute right-0 mt-2 w-80 bg-[#161F30] border border-[#334155] rounded-2xl shadow-2xl p-4 z-50 animate-fade-in text-xs">
-                  <div className="flex items-center justify-between mb-3 border-b border-[#27354A] pb-2">
-                    <span className="font-bold text-white">System Notifications</span>
-                    <span className="text-[10px] text-[#F43397] font-bold">Mark all read</span>
+                <div className="absolute right-0 mt-2 w-80 bg-white border border-slate-200 rounded-2xl shadow-2xl p-4 z-50 animate-fade-in text-xs">
+                  <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                    <span className="font-bold text-slate-900">System Notifications</span>
+                    <span className="text-[10px] text-[#F43397] font-bold cursor-pointer hover:underline">Mark all read</span>
                   </div>
                   <div className="space-y-2.5">
-                    <div className="p-2 rounded-xl bg-[#1E293B]/80 border border-[#334155]">
-                      <p className="font-bold text-pink-300">📦 New Bulk Order Received</p>
-                      <p className="text-[11px] text-slate-300">ORD-789124 from Sneha Patil (₹1,499)</p>
-                      <span className="text-[9px] text-slate-500">2 mins ago</span>
+                    <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                      <p className="font-bold text-slate-800">New Bulk Order Received</p>
+                      <p className="text-[11px] text-slate-500">ORD-789124 from Sneha Patil (₹1,499)</p>
+                      <span className="text-[9px] text-slate-400">2 mins ago</span>
                     </div>
-                    <div className="p-2 rounded-xl bg-[#1E293B]/80 border border-[#334155]">
-                      <p className="font-bold text-emerald-300">🛡️ Seller KYC Submitted</p>
-                      <p className="text-[11px] text-slate-300">Nexus Tech Accessories uploaded GST & PAN</p>
-                      <span className="text-[9px] text-slate-500">15 mins ago</span>
+                    <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                      <p className="font-bold text-slate-800">Seller KYC Submitted</p>
+                      <p className="text-[11px] text-slate-500">Nexus Tech Accessories uploaded GST & PAN</p>
+                      <span className="text-[9px] text-slate-400">14 mins ago</span>
                     </div>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Admin Profile Pill */}
-            <div className="hidden sm:flex items-center gap-2.5 pl-2 border-l border-[#27354A]">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#9F2089] to-[#F43397] flex items-center justify-center text-xs font-black text-white">
+            {/* Admin Profile Section */}
+            <div className="flex items-center gap-2.5 pl-2 border-l border-slate-200">
+              <div className="w-8 h-8 rounded-full bg-[#9F2089] text-white flex items-center justify-center font-black text-xs ring-2 ring-pink-100">
                 AD
               </div>
-              <div className="text-left text-xs">
-                <p className="font-bold text-white leading-none">{adminUser.name}</p>
-                <p className="text-[10px] text-slate-400 leading-none mt-0.5">{adminUser.role}</p>
+              <div className="hidden md:block text-left">
+                <p className="text-xs font-bold text-slate-800 leading-tight">Super Administrator</p>
+                <p className="text-[10px] text-slate-400 font-medium">Super Admin</p>
               </div>
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400 hidden sm:block" />
             </div>
 
             {/* Logout Button */}
             <button
-              onClick={handleAdminLogout}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-600/90 hover:bg-rose-600 text-white text-xs font-bold shadow-md border border-rose-500/50 transition-all active:scale-95 cursor-pointer"
-              title="Logout from Admin Portal"
+              onClick={handleLogout}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#F43397] hover:bg-[#e02685] text-white text-xs font-bold transition-all shadow-sm shadow-pink-600/20 cursor-pointer"
+              title="Logout from Admin Panel"
             >
-              <span>🚪</span>
+              <LogOut className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Logout</span>
             </button>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* ── Main Layout: Left Side Navigation Bar + Content Canvas ── */}
-      <div className="flex-1 flex overflow-hidden relative">
-        {/* Mobile Backdrop Overlay */}
-        {sidebarOpen && (
-          <div
-            onClick={() => setSidebarOpen(false)}
-            className="fixed inset-0 bg-black/70 backdrop-blur-xs z-40 lg:hidden"
-          />
-        )}
-
-        {/* ── LEFT-SIDE NAVIGATION BAR (SIDEBAR) ── */}
-        <aside
-          className={`fixed lg:static inset-y-0 left-0 z-50 w-72 bg-[#161F30] border-r border-[#27354A] flex flex-col shrink-0 transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none ${
-            sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-          }`}
-        >
-          {/* Sidebar Header */}
-          <div className="p-4 border-b border-[#27354A]/80 flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <span className="text-xs font-black text-[#F43397] uppercase tracking-widest flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-[#F43397] animate-pulse" />
-                NAVIGATION MENU
+        {/* Dynamic Section Content Canvas (Independently Scrollable) */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-7 space-y-6 bg-[#F8FAFC] overflow-y-auto custom-scrollbar">
+          {/* Breadcrumb + Last Updated Sub-header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1">
+            <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
+              <Home className="w-4 h-4 text-[#F43397]" />
+              <span className="text-slate-300">|</span>
+              <span className="font-bold text-slate-900 capitalize text-sm">
+                {activeSection === 'dashboard' ? 'Dashboard' : `${activeSection} Management`}
               </span>
             </div>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-1 rounded-lg text-slate-400 hover:text-white hover:bg-[#1E293B]"
-            >
-              ✕
-            </button>
-          </div>
-
-          {/* Sidebar Menu Items List with Dashboard at the Top */}
-          <div className="flex-1 p-3 space-y-1 overflow-y-auto custom-scrollbar">
-            {/* Topmost Primary Item: DASHBOARD */}
-            <button
-              onClick={() => {
-                setActiveSection('dashboard');
-                setSearchQuery('');
-                setSidebarOpen(false);
-              }}
-              className={`w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-xs font-extrabold transition-all cursor-pointer mb-2.5 ${
-                activeSection === 'dashboard'
-                  ? 'bg-gradient-to-r from-[#9F2089] via-[#D81B80] to-[#F43397] text-white shadow-xl shadow-pink-900/40 ring-1 ring-white/20'
-                  : 'bg-[#1E293B]/60 text-slate-200 hover:bg-[#1E293B] hover:text-white border border-[#334155]/60'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <span className="text-xl">📊</span>
-                <span className="text-sm font-black tracking-tight">Dashboard</span>
-              </div>
-              <span
-                className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider ${
-                  activeSection === 'dashboard' ? 'bg-white/25 text-white' : 'bg-purple-500/20 text-purple-300'
-                }`}
-              >
-                Overview
-              </span>
-            </button>
-
-            {/* Separator */}
-            <div className="px-3 pt-2 pb-1 text-[10px] font-black text-slate-500 uppercase tracking-wider">
-              Management Modules
-            </div>
-
-            {/* All remaining options below Dashboard */}
-            {sidebarItems
-              .filter((item) => item.id !== 'dashboard')
-              .map((item) => {
-                const isActive = activeSection === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => {
-                      setActiveSection(item.id);
-                      setSearchQuery('');
-                      setSidebarOpen(false);
-                    }}
-                    className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                      isActive
-                        ? 'bg-gradient-to-r from-[#9F2089] to-[#F43397] text-white shadow-lg shadow-pink-900/30 ring-1 ring-white/10'
-                        : 'text-slate-400 hover:text-white hover:bg-[#1E293B]/70'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-base">{item.icon}</span>
-                      <span className="tracking-wide">{item.label}</span>
-                    </div>
-                    {item.badge && (
-                      <span
-                        className={`text-[10px] px-2 py-0.5 rounded-full font-black ${
-                          isActive ? 'bg-white/20 text-white' : 'bg-[#1E293B] text-slate-300'
-                        }`}
-                      >
-                        {item.badge}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-          </div>
-
-          {/* Sidebar Footer */}
-          <div className="p-3 border-t border-[#27354A]/80 bg-[#0B0F19]/60 space-y-2">
-            <button
-              onClick={() => onNavigate?.('home')}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-[#1E293B]/90 hover:bg-slate-700 text-white text-xs font-bold border border-[#334155]/80 transition-all cursor-pointer shadow-sm"
-            >
-              <span>🛍️</span>
-              <span>Customer Shopping Store</span>
-            </button>
-            <div className="text-[10px] text-slate-500 text-center flex items-center justify-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              <span>Session: {adminUser.role || 'Super Admin'}</span>
+            <div className="text-[11px] text-slate-400 font-medium">
+              Last updated: 28 Oct 2026, 04:27 PM
             </div>
           </div>
-        </aside>
 
-        {/* Dynamic Section Content Canvas */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto space-y-6">
           {/* ============================================================== */}
-          {/* 1. DASHBOARD OVERVIEW                                          */}
+          {/* 1. DASHBOARD OVERVIEW (Matching Screenshot Exactly)            */}
           {/* ============================================================== */}
           {activeSection === 'dashboard' && (
             <div className="space-y-6">
-              <div>
-                <h1 className="text-2xl font-black text-white">Dashboard Overview</h1>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Real-time pulse across users, sellers, revenue, and active orders.
-                </p>
-              </div>
+              {/* Welcome Banner Card */}
+              <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative overflow-hidden">
+                <div>
+                  <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                    Good Afternoon, Super Administrator 👋
+                  </h1>
+                  <p className="text-xs text-slate-500 font-medium mt-1">
+                    Here's what's happening with your platform today.
+                  </p>
+                </div>
 
-              {/* 8 Metric Cards */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 sm:gap-4">
-                {[
-                  { label: 'Total Users', value: metrics.totalUsers, change: '+12.4%', color: 'from-[#9F2089]/25 to-[#F43397]/15', border: 'border-[#F43397]/30', icon: '👥' },
-                  { label: 'Total Sellers', value: metrics.totalSellers, change: '+8.1%', color: 'from-purple-900/35 to-pink-900/25', border: 'border-purple-500/30', icon: '💼' },
-                  { label: 'Total Products', value: metrics.totalProducts, change: '+18.2%', color: 'from-emerald-950/40 to-teal-900/25', border: 'border-[#038D63]/30', icon: '📦' },
-                  { label: 'Total Orders', value: metrics.totalOrders, change: '+24.5%', color: 'from-amber-950/40 to-orange-900/25', border: 'border-amber-500/30', icon: '🛍️' },
-                  { label: 'Total Revenue', value: metrics.totalRevenue, change: '+31.8%', color: 'from-[#F43397]/25 to-[#FF8A00]/20', border: 'border-[#F43397]/40', icon: '💳' },
-                  { label: 'Pending Orders', value: metrics.pendingOrders, change: 'Action Required', color: 'from-rose-950/40 to-red-900/25', border: 'border-rose-500/30', icon: '⏳' },
-                  { label: 'Pending KYC', value: metrics.pendingKyc, change: 'Requires Approval', color: 'from-cyan-950/40 to-blue-900/25', border: 'border-cyan-500/30', icon: '🛡️' },
-                  { label: 'Pending Complaints', value: metrics.pendingComplaints, change: 'Needs Resolution', color: 'from-yellow-950/40 to-amber-900/25', border: 'border-yellow-500/30', icon: '⚠️' },
-                ].map((card, i) => (
-                  <div
-                    key={i}
-                    className={`bg-gradient-to-br ${card.color} border ${card.border} rounded-2xl p-4 flex flex-col justify-between`}
-                  >
-                    <div className="flex items-center justify-between text-xs text-slate-300 font-semibold mb-2">
-                      <span>{card.label}</span>
-                      <span className="text-base">{card.icon}</span>
-                    </div>
-                    <div>
-                      <p className="text-xl sm:text-2xl font-black text-white">{card.value}</p>
-                      <p className="text-[10px] text-emerald-400 font-bold mt-1">{card.change}</p>
-                    </div>
+                {/* Right Promo Banner Card */}
+                <div className="flex items-center gap-4 bg-gradient-to-r from-pink-50/80 via-purple-50/50 to-pink-50/30 border border-pink-100 rounded-2xl p-3.5 sm:px-5">
+                  <div className="w-10 h-10 rounded-xl bg-[#F43397]/10 text-[#F43397] flex items-center justify-center text-lg">
+                    📈
                   </div>
-                ))}
+                  <div>
+                    <p className="text-xs font-bold text-slate-800">Grow Your Business With Shopio</p>
+                    <button
+                      onClick={() => setActiveSection('analytics')}
+                      className="mt-1 inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-[#F43397] hover:bg-[#e02685] text-white text-[11px] font-bold shadow-xs transition-colors cursor-pointer"
+                    >
+                      View Reports →
+                    </button>
+                  </div>
+                </div>
               </div>
 
-              {/* Charts Section */}
+              {/* 8 Metric KPI Cards in 4x2 Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {[
+                  { label: 'Total Users', value: metrics.totalUsers, change: '↑ 12.4% vs last month', isTrend: true, sparklineKey: 'users', sparkColor: '#10B981', icon: Users, iconColor: 'bg-pink-50 text-[#F43397]' },
+                  { label: 'Total Sellers', value: metrics.totalSellers, change: '↑ 8.1% vs last month', isTrend: true, sparklineKey: 'sellers', sparkColor: '#8B5CF6', icon: Store, iconColor: 'bg-pink-50 text-[#F43397]' },
+                  { label: 'Total Products', value: metrics.totalProducts, change: '↑ 18.2% vs last month', isTrend: true, sparklineKey: 'products', sparkColor: '#10B981', icon: Package, iconColor: 'bg-emerald-50 text-emerald-600' },
+                  { label: 'Total Orders', value: metrics.totalOrders, change: '↑ 24.5% vs last month', isTrend: true, sparklineKey: 'orders', sparkColor: '#F43397', icon: ShoppingBag, iconColor: 'bg-purple-50 text-purple-600' },
+                  { label: 'Total Revenue', value: metrics.totalRevenue, change: '↑ 31.8% vs last month', isTrend: true, sparklineKey: 'revenue', sparkColor: '#F43397', icon: IndianRupee, iconColor: 'bg-pink-50 text-[#F43397]' },
+                  { label: 'Pending Orders', value: metrics.pendingOrders, change: 'Action Required', pillClass: 'bg-rose-50 text-rose-600 border-rose-200/60', sparklineKey: 'pendingOrders', sparkColor: '#F43F5E', icon: Clock, iconColor: 'bg-rose-50 text-rose-500' },
+                  { label: 'Pending KYC', value: metrics.pendingKyc, change: 'Requires Approval', pillClass: 'bg-blue-50 text-blue-600 border-blue-200/60', sparklineKey: 'pendingKyc', sparkColor: '#0284C7', icon: ShieldCheck, iconColor: 'bg-blue-50 text-blue-600' },
+                  { label: 'Pending Complaints', value: metrics.pendingComplaints, change: 'Needs Resolution', pillClass: 'bg-amber-50 text-amber-600 border-amber-200/60', sparklineKey: 'pendingComplaints', sparkColor: '#F59E0B', icon: AlertTriangle, iconColor: 'bg-amber-50 text-amber-500' },
+                ].map((card, i) => {
+                  const Icon = card.icon;
+                  return (
+                    <div
+                      key={i}
+                      className="bg-white border border-slate-100 rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md transition-all flex flex-col justify-between"
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className={`w-8 h-8 rounded-xl ${card.iconColor} flex items-center justify-center shrink-0`}>
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <span className="text-xs font-semibold text-slate-500">{card.label}</span>
+                      </div>
+
+                      <div className="my-1">
+                        <p className="text-2xl font-black text-slate-900 tracking-tight">
+                          {typeof card.value === 'number' ? card.value.toLocaleString('en-IN') : card.value}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-2">
+                        {card.isTrend ? (
+                          <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-0.5">
+                            {card.change}
+                          </span>
+                        ) : (
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${card.pillClass}`}>
+                            {card.change}
+                          </span>
+                        )}
+
+                        <div className="w-16 h-8 flex items-center justify-end">
+                          <Sparkline
+                            data={KPI_SPARKLINES[card.sparklineKey] || [10, 20, 15, 30, 25]}
+                            color={card.sparkColor}
+                            height={28}
+                            width={64}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Analytics Section: 2 Columns (Sales Overview + Top Sales Categories) */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Sales Overview AreaChart */}
-                <div className="lg:col-span-2 bg-[#161F30] border border-[#27354A] rounded-3xl p-5 shadow-lg">
+                {/* 2/3 Width: Sales & Revenue Overview AreaChart */}
+                <div className="lg:col-span-2 bg-white border border-slate-100 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow">
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      <h3 className="font-extrabold text-sm text-white">Sales & Revenue Overview</h3>
+                      <h3 className="font-extrabold text-sm text-slate-900">Sales & Revenue Overview</h3>
                       <p className="text-[11px] text-slate-400">Monthly Gross Revenue vs Net Profit</p>
                     </div>
-                    <span className="text-xs px-2.5 py-1 rounded-xl bg-pink-500/10 text-[#F43397] border border-pink-500/20 font-bold">
-                      2026 Live
-                    </span>
+
+                    <div className="flex items-center gap-4">
+                      {/* Legend */}
+                      <div className="flex items-center gap-3 text-xs font-semibold">
+                        <span className="flex items-center gap-1.5 text-slate-700">
+                          <span className="w-2.5 h-2.5 rounded-full bg-[#F43397]" />
+                          Revenue
+                        </span>
+                        <span className="flex items-center gap-1.5 text-slate-700">
+                          <span className="w-2.5 h-2.5 rounded-full bg-[#8B5CF6]" />
+                          Profit
+                        </span>
+                      </div>
+
+                      <span className="text-xs px-2.5 py-0.5 rounded-full bg-pink-50 text-[#F43397] border border-pink-200/80 font-bold">
+                        2026 Live
+                      </span>
+                    </div>
                   </div>
+
                   <div className="h-64 w-full">
                     <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={salesOverviewData}>
+                      <AreaChart data={TWELVE_MONTH_SALES_DATA}>
                         <defs>
-                          <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#F43397" stopOpacity={0.8} />
-                            <stop offset="95%" stopColor="#9F2089" stopOpacity={0.05} />
+                          <linearGradient id="colorRevEnterprise" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#F43397" stopOpacity={0.6} />
+                            <stop offset="95%" stopColor="#F43397" stopOpacity={0.02} />
                           </linearGradient>
-                          <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#038D63" stopOpacity={0.8} />
-                            <stop offset="95%" stopColor="#038D63" stopOpacity={0.05} />
+                          <linearGradient id="colorProfitEnterprise" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.5} />
+                            <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0.02} />
                           </linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#27354A" />
-                        <XAxis dataKey="month" stroke="#64748b" textAnchor="end" fontSize={11} />
-                        <YAxis stroke="#64748b" fontSize={11} tickFormatter={(v) => `₹${v / 1000}k`} />
-                        <Tooltip
-                          contentStyle={{ backgroundColor: '#161F30', borderColor: '#27354A', borderRadius: '1rem', fontSize: '12px' }}
+                        <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
+                        <XAxis dataKey="month" stroke="#94A3B8" fontSize={11} tickLine={false} />
+                        <YAxis
+                          stroke="#94A3B8"
+                          fontSize={11}
+                          tickLine={false}
+                          tickFormatter={(v) => `₹${v.toLocaleString('en-IN')}`}
                         />
-                        <Legend />
-                        <Area type="monotone" dataKey="revenue" stroke="#F43397" strokeWidth={2.5} fillOpacity={1} fill="url(#colorRev)" name="Revenue (₹)" />
-                        <Area type="monotone" dataKey="profit" stroke="#038D63" strokeWidth={2} fillOpacity={1} fill="url(#colorProfit)" name="Profit (₹)" />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: '#FFFFFF',
+                            borderColor: '#E2E8F0',
+                            borderRadius: '0.75rem',
+                            fontSize: '12px',
+                            color: '#0F172A',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                          }}
+                          formatter={(value, name) => [`₹${Number(value).toLocaleString('en-IN')}`, name === 'revenue' ? 'Revenue' : 'Profit']}
+                        />
+                        <Area
+                          type="monotone"
+                          dataKey="revenue"
+                          stroke="#F43397"
+                          strokeWidth={2.5}
+                          fillOpacity={1}
+                          fill="url(#colorRevEnterprise)"
+                          name="Revenue"
+                        />
+                        <Area
+                          type="monotone"
+                          dataKey="profit"
+                          stroke="#8B5CF6"
+                          strokeWidth={2}
+                          fillOpacity={1}
+                          fill="url(#colorProfitEnterprise)"
+                          name="Profit"
+                        />
                       </AreaChart>
                     </ResponsiveContainer>
                   </div>
                 </div>
 
-                {/* Top Categories PieChart */}
-                <div className="bg-[#161F30] border border-[#27354A] rounded-3xl p-5 shadow-lg flex flex-col justify-between">
+                {/* 1/3 Width: Top Sales Categories Donut Chart with Center Text */}
+                <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow flex flex-col justify-between">
                   <div>
-                    <h3 className="font-extrabold text-sm text-white">Top Sales Categories</h3>
+                    <h3 className="font-extrabold text-sm text-slate-900">Top Sales Categories</h3>
                     <p className="text-[11px] text-slate-400">Distribution of orders by catalog</p>
                   </div>
-                  <div className="h-48 w-full my-2">
+
+                  {/* Donut with Center Text */}
+                  <div className="relative h-48 w-full my-2 flex items-center justify-center">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
-                        <Pie data={categoryDistribution} cx="50%" cy="50%" innerRadius={45} outerRadius={70} dataKey="value">
-                          {categoryDistribution.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
+                        <Pie
+                          data={CATEGORY_DISTRIBUTION_CHART}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={50}
+                          outerRadius={75}
+                          dataKey="value"
+                          strokeWidth={2}
+                          stroke="#ffffff"
+                        >
+                          {CATEGORY_DISTRIBUTION_CHART.map((entry, index) => (
+                            <Cell key={`donut-${index}`} fill={entry.color} />
                           ))}
                         </Pie>
-                        <Tooltip contentStyle={{ backgroundColor: '#161F30', borderColor: '#27354A', borderRadius: '0.75rem', fontSize: '11px' }} />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: '#FFFFFF',
+                            borderColor: '#E2E8F0',
+                            borderRadius: '0.75rem',
+                            fontSize: '11px',
+                            color: '#0F172A',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                          }}
+                          formatter={(v, name) => [`${v}%`, name]}
+                        />
                       </PieChart>
                     </ResponsiveContainer>
+
+                    {/* Centered Donut Label */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                      <span className="text-[10px] font-medium text-slate-400">Total Orders</span>
+                      <span className="text-base font-black text-slate-900">1480</span>
+                    </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-2 text-[11px]">
-                    {categoryDistribution.map((cat, idx) => (
-                      <div key={idx} className="flex items-center gap-1.5">
-                        <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cat.color }} />
-                        <span className="text-slate-300 font-medium truncate">{cat.name}: {cat.value}%</span>
+
+                  {/* Category Legend list */}
+                  <div className="grid grid-cols-2 gap-2 text-xs pt-1">
+                    {CATEGORY_DISTRIBUTION_CHART.map((cat, idx) => (
+                      <div key={idx} className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: cat.color }} />
+                          <span className="text-slate-600 truncate text-[11px] font-medium">{cat.name}</span>
+                        </div>
+                        <span className="font-bold text-slate-900 text-[11px]">{cat.value}%</span>
                       </div>
                     ))}
                   </div>
                 </div>
               </div>
 
-              {/* User Growth BarChart */}
-              <div className="bg-[#161F30] border border-[#27354A] rounded-3xl p-5 shadow-lg">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h3 className="font-extrabold text-sm text-white">Customer & Seller Onboarding Growth</h3>
-                    <p className="text-[11px] text-slate-400">Total registered customers vs verified merchants</p>
+              {/* Bottom 3-Column Grid: Recent Orders, Top Selling Products, Recent Activity */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* 1. Recent Orders */}
+                <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-3">
+                    <h3 className="font-extrabold text-sm text-slate-900">Recent Orders</h3>
+                    <button
+                      onClick={() => setActiveSection('orders')}
+                      className="text-xs font-bold text-[#F43397] hover:underline"
+                    >
+                      View All →
+                    </button>
                   </div>
-                </div>
-                <div className="h-56 w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={userGrowthData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#27354A" />
-                      <XAxis dataKey="month" stroke="#64748b" fontSize={11} />
-                      <YAxis stroke="#64748b" fontSize={11} />
-                      <Tooltip contentStyle={{ backgroundColor: '#161F30', borderColor: '#27354A', borderRadius: '0.75rem', fontSize: '12px' }} />
-                      <Legend />
-                      <Bar dataKey="customers" fill="#9F2089" radius={[6, 6, 0, 0]} name="Customers" />
-                      <Bar dataKey="sellers" fill="#F43397" radius={[6, 6, 0, 0]} name="Sellers" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
 
-              {/* Recent Orders Table */}
-              <div className="bg-[#161F30] border border-[#27354A] rounded-3xl p-5 shadow-lg">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h3 className="font-extrabold text-sm text-white">Recent Orders Stream</h3>
-                    <p className="text-[11px] text-slate-400">Latest transactions requiring fulfillment</p>
-                  </div>
-                  <button
-                    onClick={() => setActiveSection('orders')}
-                    className="text-xs font-bold text-[#F43397] hover:underline"
-                  >
-                    View All Orders →
-                  </button>
-                </div>
-
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
-                    <thead>
-                      <tr className="border-b border-[#27354A] text-slate-400">
-                        <th className="pb-3 font-bold">Order ID</th>
-                        <th className="pb-3 font-bold">Customer</th>
-                        <th className="pb-3 font-bold">Product</th>
-                        <th className="pb-3 font-bold">Seller</th>
-                        <th className="pb-3 font-bold">Amount</th>
-                        <th className="pb-3 font-bold">Status</th>
-                        <th className="pb-3 font-bold">Date</th>
-                        <th className="pb-3 font-bold text-right">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[#27354A]/60 font-medium">
-                      {orders.slice(0, 5).map((ord) => (
-                        <tr key={ord.id} className="hover:bg-[#1E293B]/60 transition-colors">
-                          <td className="py-3 font-mono font-bold text-[#F43397]">{ord.id}</td>
-                          <td className="py-3 text-white">{ord.customer}</td>
-                          <td className="py-3 text-slate-300 max-w-[200px] truncate">{ord.product}</td>
-                          <td className="py-3 text-slate-400">{ord.seller}</td>
-                          <td className="py-3 font-bold text-white">₹{ord.amount}</td>
-                          <td className="py-3">
-                            <span
-                              className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                                ord.orderStatus === 'Delivered'
-                                  ? 'bg-emerald-500/20 text-emerald-400'
-                                  : ord.orderStatus === 'Shipped'
-                                  ? 'bg-blue-500/20 text-blue-400'
-                                  : ord.orderStatus === 'Returned'
-                                  ? 'bg-rose-500/20 text-rose-400'
-                                  : 'bg-amber-500/20 text-amber-400'
-                              }`}
-                            >
-                              {ord.orderStatus}
-                            </span>
-                          </td>
-                          <td className="py-3 text-slate-400 text-[11px]">{ord.date}</td>
-                          <td className="py-3 text-right">
-                            <button
-                              onClick={() => setSelectedItemModal({ type: 'order', item: ord })}
-                              className="px-2.5 py-1 rounded-lg bg-gradient-to-r from-[#9F2089] to-[#F43397] hover:opacity-95 text-white font-bold text-[10px] transition-colors"
-                            >
-                              View
-                            </button>
-                          </td>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead>
+                        <tr className="text-slate-400 border-b border-slate-100 text-[11px]">
+                          <th className="pb-2 font-bold">Order ID</th>
+                          <th className="pb-2 font-bold">Customer</th>
+                          <th className="pb-2 font-bold">Amount</th>
+                          <th className="pb-2 font-bold">Status</th>
+                          <th className="pb-2 font-bold">Date</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {[
+                          { id: '#ORD-1024', customer: 'Rahul Sharma', amount: '₹1,250', status: 'Delivered', statusColor: 'bg-emerald-50 text-emerald-600', date: '28 Oct 2026' },
+                          { id: '#ORD-1023', customer: 'Sneha Patil', amount: '₹2,340', status: 'Processing', statusColor: 'bg-blue-50 text-blue-600', date: '27 Oct 2026' },
+                          { id: '#ORD-1022', customer: 'Amit Kumar', amount: '₹890', status: 'Shipped', statusColor: 'bg-purple-50 text-purple-600', date: '27 Oct 2026' },
+                          { id: '#ORD-1021', customer: 'Pooja Deshmukh', amount: '₹4,560', status: 'Delivered', statusColor: 'bg-emerald-50 text-emerald-600', date: '27 Oct 2026' },
+                          { id: '#ORD-1020', customer: 'Vikram Singh', amount: '₹1,780', status: 'Pending', statusColor: 'bg-amber-50 text-amber-600', date: '26 Oct 2026' },
+                        ].map((ord) => (
+                          <tr key={ord.id} className="hover:bg-slate-50/60 transition-colors">
+                            <td className="py-2.5 font-bold text-slate-900 font-mono text-[11px]">{ord.id}</td>
+                            <td className="py-2.5 text-slate-700 text-[11px]">{ord.customer}</td>
+                            <td className="py-2.5 font-bold text-slate-900 text-[11px]">{ord.amount}</td>
+                            <td className="py-2.5">
+                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1 w-fit ${ord.statusColor}`}>
+                                <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                                {ord.status}
+                              </span>
+                            </td>
+                            <td className="py-2.5 text-slate-400 text-[10px]">{ord.date}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* 2. Top Selling Products */}
+                <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-3">
+                    <h3 className="font-extrabold text-sm text-slate-900">Top Selling Products</h3>
+                    <button
+                      onClick={() => setActiveSection('products')}
+                      className="text-xs font-bold text-[#F43397] hover:underline"
+                    >
+                      View All →
+                    </button>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead>
+                        <tr className="text-slate-400 border-b border-slate-100 text-[11px]">
+                          <th className="pb-2 font-bold">Product</th>
+                          <th className="pb-2 font-bold">Sold</th>
+                          <th className="pb-2 font-bold">Revenue</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {TOP_SELLING_PRODUCTS.map((p) => (
+                          <tr key={p.id} className="hover:bg-slate-50/60 transition-colors">
+                            <td className="py-2.5">
+                              <div className="flex items-center gap-2">
+                                <span className="text-base">{p.icon}</span>
+                                <span className="font-bold text-slate-800 text-[11px] truncate max-w-[120px]">{p.name}</span>
+                              </div>
+                            </td>
+                            <td className="py-2.5 text-slate-600 font-medium text-[11px]">{p.sold}</td>
+                            <td className="py-2.5 font-bold text-slate-900 text-[11px]">{p.revenue}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* 3. Recent Activity */}
+                <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-3">
+                    <h3 className="font-extrabold text-sm text-slate-900">Recent Activity</h3>
+                    <button
+                      onClick={() => setActiveSection('notifications')}
+                      className="text-xs font-bold text-[#F43397] hover:underline"
+                    >
+                      View All →
+                    </button>
+                  </div>
+
+                  <div className="space-y-3.5 pt-1">
+                    {RECENT_ACTIVITIES.map((act) => {
+                      const Icon = act.icon;
+                      return (
+                        <div key={act.id} className="flex items-start gap-3">
+                          <div className={`w-8 h-8 rounded-full ${act.iconBg} flex items-center justify-center shrink-0 mt-0.5`}>
+                            <Icon className="w-4 h-4" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-bold text-slate-800 leading-tight truncate">{act.title}</p>
+                            <p className="text-[11px] text-slate-400 mt-0.5 truncate">{act.desc}</p>
+                          </div>
+                          <span className="text-[10px] text-slate-400 font-medium shrink-0">{act.time}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* ============================================================== */}
+{/* ============================================================== */}
           {/* 2. USER MANAGEMENT                                             */}
           {/* ============================================================== */}
           {activeSection === 'users' && (
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h1 className="text-2xl font-black text-white">User Management</h1>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <h1 className="text-2xl font-black text-slate-900">User Management</h1>
+                  <p className="text-xs text-gray-500 mt-0.5">
                     View user directory, order records, block or suspend access.
                   </p>
                 </div>
@@ -1430,7 +1714,7 @@ export default function ShopioAdminPortal({
                   <select
                     value={userStatusFilter}
                     onChange={(e) => setUserStatusFilter(e.target.value)}
-                    className="bg-[#161F30] border border-[#334155] rounded-xl px-3 py-2 text-xs text-white outline-none"
+                    className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-gray-800 bg-gray-50 border border-slate-200 outline-none focus:border-[#F43397]"
                   >
                     <option value="all">All Statuses</option>
                     <option value="active">Active Only</option>
@@ -1441,10 +1725,10 @@ export default function ShopioAdminPortal({
               </div>
 
               {/* Users Table */}
-              <div className="bg-[#161F30] border border-[#27354A] rounded-3xl p-5 shadow-lg overflow-x-auto">
+              <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead>
-                    <tr className="border-b border-[#27354A] text-slate-400">
+                    <tr className="border-b border-slate-100 text-gray-500">
                       <th className="pb-3 font-bold">User ID</th>
                       <th className="pb-3 font-bold">Name</th>
                       <th className="pb-3 font-bold">Mobile</th>
@@ -1455,32 +1739,32 @@ export default function ShopioAdminPortal({
                       <th className="pb-3 font-bold text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#27354A]/60 font-medium">
+                  <tbody className="divide-y divide-slate-100 font-medium">
                     {filteredUsers.map((user) => (
-                      <tr key={user.id} className="hover:bg-[#1E293B]/60 transition-colors">
+                      <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                         <td className="py-3 font-mono font-bold text-[#F43397]">{user.id}</td>
-                        <td className="py-3 text-white font-bold">{user.name}</td>
-                        <td className="py-3 text-slate-300">{user.phone}</td>
-                        <td className="py-3 text-slate-400">{user.email}</td>
-                        <td className="py-3 text-slate-200 font-bold">{user.ordersCount || 0}</td>
+                        <td className="py-3 text-gray-900 font-bold">{user.name}</td>
+                        <td className="py-3 text-gray-700">{user.phone}</td>
+                        <td className="py-3 text-gray-500">{user.email}</td>
+                        <td className="py-3 text-gray-800 font-bold">{user.ordersCount || 0}</td>
                         <td className="py-3">
                           <span
                             className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                               user.status === 'active'
-                                ? 'bg-emerald-500/20 text-emerald-400'
+                                ? 'bg-emerald-50 text-emerald-600 border border-emerald-200/60 font-bold'
                                 : user.status === 'blocked'
-                                ? 'bg-rose-500/20 text-rose-400'
-                                : 'bg-amber-500/20 text-amber-400'
+                                ? 'bg-rose-50 text-rose-600 border border-rose-200/60 font-bold'
+                                : 'bg-amber-50 text-amber-600 border border-amber-200/60 font-bold'
                             }`}
                           >
                             {user.status || 'active'}
                           </span>
                         </td>
-                        <td className="py-3 text-slate-400 text-[11px]">{user.joinedDate || '2026'}</td>
+                        <td className="py-3 text-gray-500 text-[11px]">{user.joinedDate || '2026'}</td>
                         <td className="py-3 text-right space-x-1.5">
                           <button
                             onClick={() => setSelectedItemModal({ type: 'user', item: user })}
-                            className="px-2 py-1 rounded-lg bg-[#1E293B] hover:bg-slate-700 text-slate-200 text-[10px] font-bold"
+                            className="px-2 py-1 rounded-lg bg-gray-50 hover:bg-pink-50 hover:text-[#9F2089] text-gray-800 text-[10px] font-bold"
                           >
                             Details
                           </button>
@@ -1521,8 +1805,8 @@ export default function ShopioAdminPortal({
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h1 className="text-2xl font-black text-white">Seller Management</h1>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <h1 className="text-2xl font-black text-slate-900">Seller Management</h1>
+                  <p className="text-xs text-gray-500 mt-0.5">
                     Approve merchants, inspect catalog sizes, review payouts and KYC.
                   </p>
                 </div>
@@ -1531,7 +1815,7 @@ export default function ShopioAdminPortal({
                   <select
                     value={sellerStatusFilter}
                     onChange={(e) => setSellerStatusFilter(e.target.value)}
-                    className="bg-[#161F30] border border-[#334155] rounded-xl px-3 py-2 text-xs text-white outline-none"
+                    className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-gray-800 bg-gray-50 border border-slate-200 outline-none focus:border-[#F43397]"
                   >
                     <option value="all">All Seller Statuses</option>
                     <option value="pending">Pending</option>
@@ -1541,10 +1825,10 @@ export default function ShopioAdminPortal({
                 </div>
               </div>
 
-              <div className="bg-[#161F30] border border-[#27354A] rounded-3xl p-5 shadow-lg overflow-x-auto">
+              <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead>
-                    <tr className="border-b border-[#27354A] text-slate-400">
+                    <tr className="border-b border-slate-100 text-gray-500">
                       <th className="pb-3 font-bold">Seller ID</th>
                       <th className="pb-3 font-bold">Business Name</th>
                       <th className="pb-3 font-bold">Contact</th>
@@ -1555,24 +1839,24 @@ export default function ShopioAdminPortal({
                       <th className="pb-3 font-bold text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#27354A]/60 font-medium">
+                  <tbody className="divide-y divide-slate-100 font-medium">
                     {filteredSellers.map((seller) => (
-                      <tr key={seller.id} className="hover:bg-[#1E293B]/60 transition-colors">
+                      <tr key={seller.id} className="hover:bg-gray-50 transition-colors">
                         <td className="py-3 font-mono font-bold text-[#F43397]">{seller.id}</td>
-                        <td className="py-3 text-white font-bold">{seller.businessName}</td>
-                        <td className="py-3 text-slate-300">
+                        <td className="py-3 text-gray-900 font-bold">{seller.businessName}</td>
+                        <td className="py-3 text-gray-700">
                           {seller.contactPerson} ({seller.phone})
                         </td>
-                        <td className="py-3 text-slate-200">{seller.productsCount} items</td>
+                        <td className="py-3 text-gray-800">{seller.productsCount} items</td>
                         <td className="py-3 text-amber-400 font-bold">⭐ {seller.rating}</td>
                         <td className="py-3">
                           <span
                             className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                               seller.kycStatus === 'Verified'
-                                ? 'bg-emerald-500/20 text-emerald-400'
+                                ? 'bg-emerald-50 text-emerald-600 border border-emerald-200/60 font-bold'
                                 : seller.kycStatus === 'Pending'
-                                ? 'bg-amber-500/20 text-amber-400'
-                                : 'bg-rose-500/20 text-rose-400'
+                                ? 'bg-amber-50 text-amber-600 border border-amber-200/60 font-bold'
+                                : 'bg-rose-50 text-rose-600 border border-rose-200/60 font-bold'
                             }`}
                           >
                             {seller.kycStatus}
@@ -1582,10 +1866,10 @@ export default function ShopioAdminPortal({
                           <span
                             className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                               seller.status === 'Approved'
-                                ? 'bg-emerald-500/20 text-emerald-400'
+                                ? 'bg-emerald-50 text-emerald-600 border border-emerald-200/60 font-bold'
                                 : seller.status === 'Pending'
-                                ? 'bg-amber-500/20 text-amber-400'
-                                : 'bg-rose-500/20 text-rose-400'
+                                ? 'bg-amber-50 text-amber-600 border border-amber-200/60 font-bold'
+                                : 'bg-rose-50 text-rose-600 border border-rose-200/60 font-bold'
                             }`}
                           >
                             {seller.status}
@@ -1594,7 +1878,7 @@ export default function ShopioAdminPortal({
                         <td className="py-3 text-right space-x-1.5">
                           <button
                             onClick={() => setSelectedItemModal({ type: 'seller', item: seller })}
-                            className="px-2 py-1 rounded-lg bg-[#1E293B] hover:bg-slate-700 text-slate-200 text-[10px] font-bold"
+                            className="px-2 py-1 rounded-lg bg-gray-50 hover:bg-pink-50 hover:text-[#9F2089] text-gray-800 text-[10px] font-bold"
                           >
                             View
                           </button>
@@ -1634,8 +1918,8 @@ export default function ShopioAdminPortal({
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h1 className="text-2xl font-black text-white">Product Catalog Management</h1>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <h1 className="text-2xl font-black text-slate-900">Product Catalog Management</h1>
+                  <p className="text-xs text-gray-500 mt-0.5">
                     Search, filter, approve, modify prices and inspect live product listings.
                   </p>
                 </div>
@@ -1647,10 +1931,10 @@ export default function ShopioAdminPortal({
                 </button>
               </div>
 
-              <div className="bg-[#161F30] border border-[#27354A] rounded-3xl p-5 shadow-lg overflow-x-auto">
+              <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead>
-                    <tr className="border-b border-[#27354A] text-slate-400">
+                    <tr className="border-b border-slate-100 text-gray-500">
                       <th className="pb-3 font-bold">Product ID</th>
                       <th className="pb-3 font-bold">Title</th>
                       <th className="pb-3 font-bold">Category</th>
@@ -1661,7 +1945,7 @@ export default function ShopioAdminPortal({
                       <th className="pb-3 font-bold text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#27354A]/60 font-medium">
+                  <tbody className="divide-y divide-slate-100 font-medium">
                     {[
                       { id: 'p1', name: 'Kanjivaram Soft Silk Saree with Blouse', cat: 'Women Ethnic', price: '₹1,499', stock: 120, rating: 4.8, status: 'Approved' },
                       { id: 'p2', name: 'Cotton Printed Anarkali Kurti', cat: 'Women Western', price: '₹599', stock: 85, rating: 4.5, status: 'Approved' },
@@ -1669,15 +1953,15 @@ export default function ShopioAdminPortal({
                       { id: 'p4', name: 'boAt Rockerz Wireless Headphones', cat: 'Electronics', price: '₹1,299', stock: 15, rating: 4.7, status: 'Approved' },
                       { id: 'p5', name: 'Non-stick Granite Cookware Set', cat: 'Home & Kitchen', price: '₹2,199', stock: 8, rating: 4.2, status: 'Pending' },
                     ].map((prod) => (
-                      <tr key={prod.id} className="hover:bg-[#1E293B]/60 transition-colors">
+                      <tr key={prod.id} className="hover:bg-gray-50 transition-colors">
                         <td className="py-3 font-mono font-bold text-[#F43397]">{prod.id}</td>
-                        <td className="py-3 text-white font-bold">{prod.name}</td>
-                        <td className="py-3 text-slate-300">{prod.cat}</td>
-                        <td className="py-3 font-bold text-white">{prod.price}</td>
-                        <td className="py-3 text-slate-200">{prod.stock} units</td>
+                        <td className="py-3 text-gray-900 font-bold">{prod.name}</td>
+                        <td className="py-3 text-gray-700">{prod.cat}</td>
+                        <td className="py-3 font-bold text-gray-900">{prod.price}</td>
+                        <td className="py-3 text-gray-800">{prod.stock} units</td>
                         <td className="py-3 text-amber-400">⭐ {prod.rating}</td>
                         <td className="py-3">
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200/60 font-bold">
                             {prod.status}
                           </span>
                         </td>
@@ -1710,8 +1994,8 @@ export default function ShopioAdminPortal({
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-2xl font-black text-white">Categories Management</h1>
-                  <p className="text-xs text-slate-400 mt-0.5">Organize shopping taxology and catalog divisions.</p>
+                  <h1 className="text-2xl font-black text-slate-900">Categories Management</h1>
+                  <p className="text-xs text-gray-500 mt-0.5">Organize shopping taxology and catalog divisions.</p>
                 </div>
                 <button
                   onClick={() => onShowToast?.('Category created!', 'success')}
@@ -1732,12 +2016,12 @@ export default function ShopioAdminPortal({
                   { name: 'Jewellery', icon: '💍', count: 280 },
                   { name: 'Electronics', icon: '📱', count: 190 },
                 ].map((cat, i) => (
-                  <div key={i} className="p-4 rounded-2xl bg-[#161F30] border border-[#27354A] flex items-center justify-between">
+                  <div key={i} className="p-4 rounded-2xl bg-white border border-slate-200 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <span className="text-2xl">{cat.icon}</span>
                       <div>
-                        <p className="font-bold text-white text-xs">{cat.name}</p>
-                        <p className="text-[10px] text-slate-400">{cat.count} products</p>
+                        <p className="font-bold text-gray-900 text-xs">{cat.name}</p>
+                        <p className="text-[10px] text-gray-500">{cat.count} products</p>
                       </div>
                     </div>
                   </div>
@@ -1753,8 +2037,8 @@ export default function ShopioAdminPortal({
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h1 className="text-2xl font-black text-white">Order Management</h1>
-                  <p className="text-xs text-slate-400 mt-0.5">Track fulfillment status from placement to delivery.</p>
+                  <h1 className="text-2xl font-black text-slate-900">Order Management</h1>
+                  <p className="text-xs text-gray-500 mt-0.5">Track fulfillment status from placement to delivery.</p>
                 </div>
 
                 <div className="flex items-center gap-2 overflow-x-auto">
@@ -1765,7 +2049,7 @@ export default function ShopioAdminPortal({
                       className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
                         orderStatusFilter === st
                           ? 'bg-gradient-to-r from-[#9F2089] to-[#F43397] text-white shadow-md shadow-pink-500/20'
-                          : 'bg-[#161F30] text-slate-400 hover:text-white border border-[#27354A]'
+                          : 'bg-white text-gray-500 hover:text-white border border-slate-200'
                       }`}
                     >
                       {st === 'all' ? 'All Orders' : st}
@@ -1774,10 +2058,10 @@ export default function ShopioAdminPortal({
                 </div>
               </div>
 
-              <div className="bg-[#161F30] border border-[#27354A] rounded-3xl p-5 shadow-lg overflow-x-auto">
+              <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead>
-                    <tr className="border-b border-[#27354A] text-slate-400">
+                    <tr className="border-b border-slate-100 text-gray-500">
                       <th className="pb-3 font-bold">Order ID</th>
                       <th className="pb-3 font-bold">Customer</th>
                       <th className="pb-3 font-bold">Seller</th>
@@ -1788,17 +2072,17 @@ export default function ShopioAdminPortal({
                       <th className="pb-3 font-bold text-right">Update Status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#27354A]/60 font-medium">
+                  <tbody className="divide-y divide-slate-100 font-medium">
                     {filteredOrders.map((ord) => (
-                      <tr key={ord.id} className="hover:bg-[#1E293B]/60 transition-colors">
+                      <tr key={ord.id} className="hover:bg-gray-50 transition-colors">
                         <td className="py-3 font-mono font-bold text-[#F43397]">{ord.id}</td>
-                        <td className="py-3 text-white font-bold">{ord.customer}</td>
-                        <td className="py-3 text-slate-400">{ord.seller}</td>
-                        <td className="py-3 text-slate-300 max-w-[180px] truncate">{ord.product}</td>
-                        <td className="py-3 font-bold text-white">₹{ord.amount}</td>
+                        <td className="py-3 text-gray-900 font-bold">{ord.customer}</td>
+                        <td className="py-3 text-gray-500">{ord.seller}</td>
+                        <td className="py-3 text-gray-700 max-w-[180px] truncate">{ord.product}</td>
+                        <td className="py-3 font-bold text-gray-900">₹{ord.amount}</td>
                         <td className="py-3">
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                            ord.paymentStatus === 'Paid' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'
+                            ord.paymentStatus === 'Paid' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200/60 font-bold' : 'bg-amber-50 text-amber-600 border border-amber-200/60 font-bold'
                           }`}>
                             {ord.paymentStatus} ({ord.paymentMethod})
                           </span>
@@ -1812,7 +2096,7 @@ export default function ShopioAdminPortal({
                           <select
                             value={ord.orderStatus}
                             onChange={(e) => handleUpdateOrderStatus(ord.id, e.target.value)}
-                            className="bg-[#0B0F19] border border-[#334155] text-white rounded-lg px-2 py-1 text-[11px] outline-none"
+                            className="bg-[#F8F9FA] border border-slate-200 text-white rounded-lg px-2 py-1 text-[11px] outline-none"
                           >
                             {['Pending', 'Confirmed', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled', 'Returned'].map((s) => (
                               <option key={s} value={s}>{s}</option>
@@ -1833,21 +2117,21 @@ export default function ShopioAdminPortal({
           {activeSection === 'payments' && (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl font-black text-white">Payments & Settlements</h1>
-                <p className="text-xs text-slate-400 mt-0.5">UPI, Card gateways, Cash on Delivery settlement tracking.</p>
+                <h1 className="text-2xl font-black text-slate-900">Payments & Settlements</h1>
+                <p className="text-xs text-gray-500 mt-0.5">UPI, Card gateways, Cash on Delivery settlement tracking.</p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="p-4 rounded-2xl bg-[#161F30] border border-[#27354A]">
-                  <p className="text-xs text-slate-400">Gateway Success Rate</p>
+                <div className="p-4 rounded-2xl bg-white border border-slate-200">
+                  <p className="text-xs text-gray-500">Gateway Success Rate</p>
                   <p className="text-2xl font-black text-emerald-400 mt-1">98.4%</p>
                 </div>
-                <div className="p-4 rounded-2xl bg-[#161F30] border border-[#27354A]">
-                  <p className="text-xs text-slate-400">Total Settled to Merchants</p>
+                <div className="p-4 rounded-2xl bg-white border border-slate-200">
+                  <p className="text-xs text-gray-500">Total Settled to Merchants</p>
                   <p className="text-2xl font-black text-white mt-1">₹34,18,000</p>
                 </div>
-                <div className="p-4 rounded-2xl bg-[#161F30] border border-[#27354A]">
-                  <p className="text-xs text-slate-400">Escrow Balance</p>
+                <div className="p-4 rounded-2xl bg-white border border-slate-200">
+                  <p className="text-xs text-gray-500">Escrow Balance</p>
                   <p className="text-2xl font-black text-[#F43397] mt-1">₹8,67,600</p>
                 </div>
               </div>
@@ -1860,14 +2144,14 @@ export default function ShopioAdminPortal({
           {activeSection === 'returns' && (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl font-black text-white">Returns & Refunds</h1>
-                <p className="text-xs text-slate-400 mt-0.5">Customer return requests, inspection audits, and refund triggers.</p>
+                <h1 className="text-2xl font-black text-slate-900">Returns & Refunds</h1>
+                <p className="text-xs text-gray-500 mt-0.5">Customer return requests, inspection audits, and refund triggers.</p>
               </div>
 
-              <div className="bg-[#161F30] border border-[#27354A] rounded-3xl p-5 shadow-lg overflow-x-auto">
+              <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead>
-                    <tr className="border-b border-[#27354A] text-slate-400">
+                    <tr className="border-b border-slate-100 text-gray-500">
                       <th className="pb-3 font-bold">Return ID</th>
                       <th className="pb-3 font-bold">Order ID</th>
                       <th className="pb-3 font-bold">Customer</th>
@@ -1877,19 +2161,19 @@ export default function ShopioAdminPortal({
                       <th className="pb-3 font-bold text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#27354A]/60 font-medium">
+                  <tbody className="divide-y divide-slate-100 font-medium">
                     {[
                       { id: 'RET-301', ord: 'ORD-789127', cust: 'Aniket Kulkarni', reason: 'Size M too small for fit', amt: '₹899', st: 'Approved' },
                       { id: 'RET-302', ord: 'ORD-789045', cust: 'Deepak Varma', reason: 'Defective audio cable', amt: '₹1,299', st: 'Requested' },
                     ].map((ret) => (
-                      <tr key={ret.id} className="hover:bg-[#1E293B]/60 transition-colors">
+                      <tr key={ret.id} className="hover:bg-gray-50 transition-colors">
                         <td className="py-3 font-mono font-bold text-[#F43397]">{ret.id}</td>
-                        <td className="py-3 text-slate-300">{ret.ord}</td>
-                        <td className="py-3 text-white font-bold">{ret.cust}</td>
-                        <td className="py-3 text-slate-300">{ret.reason}</td>
-                        <td className="py-3 font-bold text-white">{ret.amt}</td>
+                        <td className="py-3 text-gray-700">{ret.ord}</td>
+                        <td className="py-3 text-gray-900 font-bold">{ret.cust}</td>
+                        <td className="py-3 text-gray-700">{ret.reason}</td>
+                        <td className="py-3 font-bold text-gray-900">{ret.amt}</td>
                         <td className="py-3">
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-400">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-200/60 font-bold">
                             {ret.st}
                           </span>
                         </td>
@@ -1915,8 +2199,8 @@ export default function ShopioAdminPortal({
           {activeSection === 'reviews' && (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl font-black text-white">Reviews Moderation</h1>
-                <p className="text-xs text-slate-400 mt-0.5">Filter fake reviews, inspect ratings, verify buyer badges.</p>
+                <h1 className="text-2xl font-black text-slate-900">Reviews Moderation</h1>
+                <p className="text-xs text-gray-500 mt-0.5">Filter fake reviews, inspect ratings, verify buyer badges.</p>
               </div>
 
               <div className="space-y-3">
@@ -1924,11 +2208,11 @@ export default function ShopioAdminPortal({
                   { prod: 'Kanjivaram Silk Saree', user: 'Priya Sharma', stars: 5, comment: 'Absolutely stunning quality! The blouse piece is gorgeous.', status: 'Approved' },
                   { prod: 'boAt Rockerz 450', user: 'Amit K.', stars: 1, comment: 'Spam review with non-working link', status: 'Flagged' },
                 ].map((rev, idx) => (
-                  <div key={idx} className="p-4 rounded-2xl bg-[#161F30] border border-[#27354A] flex items-center justify-between text-xs">
+                  <div key={idx} className="p-4 rounded-2xl bg-white border border-slate-200 flex items-center justify-between text-xs">
                     <div>
-                      <p className="font-bold text-white">{rev.prod} · <span className="text-amber-400">{'★'.repeat(rev.stars)}</span></p>
-                      <p className="text-slate-300 mt-1">"{rev.comment}"</p>
-                      <p className="text-[10px] text-slate-500 mt-1">By {rev.user} · Status: {rev.status}</p>
+                      <p className="font-bold text-slate-900">{rev.prod} · <span className="text-amber-400">{'★'.repeat(rev.stars)}</span></p>
+                      <p className="text-gray-700 mt-1">"{rev.comment}"</p>
+                      <p className="text-[10px] text-gray-400 mt-1">By {rev.user} · Status: {rev.status}</p>
                     </div>
                     <div className="space-x-1.5">
                       <button
@@ -1957,8 +2241,8 @@ export default function ShopioAdminPortal({
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-2xl font-black text-white">Coupons & Promotional Offers</h1>
-                  <p className="text-xs text-slate-400 mt-0.5">Create discount codes, flash sales and cashback campaigns.</p>
+                  <h1 className="text-2xl font-black text-slate-900">Coupons & Promotional Offers</h1>
+                  <p className="text-xs text-gray-500 mt-0.5">Create discount codes, flash sales and cashback campaigns.</p>
                 </div>
                 <button
                   onClick={() => onShowToast?.('Coupon created!', 'success')}
@@ -1970,7 +2254,7 @@ export default function ShopioAdminPortal({
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {coupons.map((cpn, idx) => (
-                  <div key={idx} className="p-5 rounded-3xl bg-[#161F30] border border-[#27354A] space-y-3">
+                  <div key={idx} className="p-5 rounded-3xl bg-white border border-slate-200 space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="font-mono font-black text-sm text-[#F43397] px-2.5 py-1 bg-[#F43397]/10 rounded-xl border border-[#F43397]/20">
                         {cpn.code}
@@ -1980,7 +2264,7 @@ export default function ShopioAdminPortal({
                       </span>
                     </div>
                     <p className="font-extrabold text-base text-white">{cpn.discount}</p>
-                    <div className="text-[11px] text-slate-400 space-y-0.5">
+                    <div className="text-[11px] text-gray-500 space-y-0.5">
                       <p>Min Spend: {cpn.minSpend}</p>
                       <p>Valid Till: {cpn.validTill}</p>
                       <p>Times Used: {cpn.usageCount}</p>
@@ -1997,33 +2281,33 @@ export default function ShopioAdminPortal({
           {activeSection === 'kyc' && (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl font-black text-white">KYC Verification Center</h1>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <h1 className="text-2xl font-black text-slate-900">KYC Verification Center</h1>
+                <p className="text-xs text-gray-500 mt-0.5">
                   Verify merchant PAN, GST, business registration and bank accounts.
                 </p>
               </div>
 
               <div className="space-y-4">
                 {sellers.map((s) => (
-                  <div key={s.id} className="p-5 rounded-3xl bg-[#161F30] border border-[#27354A] space-y-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#27354A] pb-3">
+                  <div key={s.id} className="p-5 rounded-3xl bg-white border border-slate-200 space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
                       <div>
                         <div className="flex items-center gap-2">
                           <h3 className="font-black text-white text-base">{s.businessName}</h3>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#1E293B] text-slate-300 font-mono">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-50 text-gray-700 font-mono">
                             {s.id}
                           </span>
                         </div>
-                        <p className="text-xs text-slate-400 mt-0.5">Contact: {s.contactPerson} ({s.phone})</p>
+                        <p className="text-xs text-gray-500 mt-0.5">Contact: {s.contactPerson} ({s.phone})</p>
                       </div>
 
                       <span
                         className={`px-3 py-1 rounded-xl text-xs font-extrabold self-start sm:self-center ${
                           s.kycStatus === 'Verified'
-                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                            ? 'bg-emerald-50 text-emerald-600 border border-emerald-200/60 font-bold border border-emerald-500/30'
                             : s.kycStatus === 'Pending'
-                            ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                            : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                            ? 'bg-amber-50 text-amber-600 border border-amber-200/60 font-bold border border-amber-500/30'
+                            : 'bg-rose-50 text-rose-600 border border-rose-200/60 font-bold border border-rose-500/30'
                         }`}
                       >
                         {s.kycStatus}
@@ -2031,17 +2315,17 @@ export default function ShopioAdminPortal({
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                      <div className="p-3 rounded-xl bg-[#0B0F19]/80 border border-[#27354A]">
-                        <span className="text-[10px] text-slate-500 block">PAN Number</span>
-                        <span className="font-mono font-bold text-slate-200">{s.pan}</span>
+                      <div className="p-3 rounded-xl bg-gray-50 border border-slate-200">
+                        <span className="text-[10px] text-gray-400 block">PAN Number</span>
+                        <span className="font-mono font-bold text-gray-800">{s.pan}</span>
                       </div>
-                      <div className="p-3 rounded-xl bg-[#0B0F19]/80 border border-[#27354A]">
-                        <span className="text-[10px] text-slate-500 block">GST Certificate</span>
-                        <span className="font-mono font-bold text-slate-200">{s.gst}</span>
+                      <div className="p-3 rounded-xl bg-gray-50 border border-slate-200">
+                        <span className="text-[10px] text-gray-400 block">GST Certificate</span>
+                        <span className="font-mono font-bold text-gray-800">{s.gst}</span>
                       </div>
-                      <div className="p-3 rounded-xl bg-[#0B0F19]/80 border border-[#27354A]">
-                        <span className="text-[10px] text-slate-500 block">Bank Account Details</span>
-                        <span className="font-mono font-bold text-slate-200 truncate block">{s.bank}</span>
+                      <div className="p-3 rounded-xl bg-gray-50 border border-slate-200">
+                        <span className="text-[10px] text-gray-400 block">Bank Account Details</span>
+                        <span className="font-mono font-bold text-gray-800 truncate block">{s.bank}</span>
                       </div>
                     </div>
 
@@ -2060,7 +2344,7 @@ export default function ShopioAdminPortal({
                       </button>
                       <button
                         onClick={() => onShowToast?.(`Request sent to ${s.businessName} for additional documents`, 'info')}
-                        className="px-3.5 py-1.5 rounded-xl bg-[#1E293B] hover:bg-slate-700 text-slate-300 font-bold text-xs"
+                        className="px-3.5 py-1.5 rounded-xl bg-gray-50 hover:bg-pink-50 hover:text-[#9F2089] text-gray-700 font-bold text-xs"
                       >
                         Request More Info
                       </button>
@@ -2077,14 +2361,14 @@ export default function ShopioAdminPortal({
           {activeSection === 'complaints' && (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl font-black text-white">Complaint Management</h1>
-                <p className="text-xs text-slate-400 mt-0.5">Manage customer and seller disputes with assigned administrators.</p>
+                <h1 className="text-2xl font-black text-slate-900">Complaint Management</h1>
+                <p className="text-xs text-gray-500 mt-0.5">Manage customer and seller disputes with assigned administrators.</p>
               </div>
 
-              <div className="bg-[#161F30] border border-[#27354A] rounded-3xl p-5 shadow-lg overflow-x-auto">
+              <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead>
-                    <tr className="border-b border-[#27354A] text-slate-400">
+                    <tr className="border-b border-slate-100 text-gray-500">
                       <th className="pb-3 font-bold">Complaint ID</th>
                       <th className="pb-3 font-bold">User</th>
                       <th className="pb-3 font-bold">Order ID</th>
@@ -2095,17 +2379,17 @@ export default function ShopioAdminPortal({
                       <th className="pb-3 font-bold text-right">Assigned Admin</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#27354A]/60 font-medium">
+                  <tbody className="divide-y divide-slate-100 font-medium">
                     {complaints.map((cmp) => (
-                      <tr key={cmp.id} className="hover:bg-[#1E293B]/60 transition-colors">
+                      <tr key={cmp.id} className="hover:bg-gray-50 transition-colors">
                         <td className="py-3 font-mono font-bold text-rose-400">{cmp.id}</td>
-                        <td className="py-3 text-white font-bold">{cmp.user}</td>
-                        <td className="py-3 text-slate-300 font-mono">{cmp.orderId}</td>
-                        <td className="py-3 text-slate-300 max-w-[220px] truncate">{cmp.issue}</td>
-                        <td className="py-3 text-slate-400 text-[11px]">{cmp.date}</td>
+                        <td className="py-3 text-gray-900 font-bold">{cmp.user}</td>
+                        <td className="py-3 text-gray-700 font-mono">{cmp.orderId}</td>
+                        <td className="py-3 text-gray-700 max-w-[220px] truncate">{cmp.issue}</td>
+                        <td className="py-3 text-gray-500 text-[11px]">{cmp.date}</td>
                         <td className="py-3">
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                            cmp.priority === 'High' ? 'bg-rose-500/20 text-rose-400' : 'bg-amber-500/20 text-amber-400'
+                            cmp.priority === 'High' ? 'bg-rose-50 text-rose-600 border border-rose-200/60 font-bold' : 'bg-amber-50 text-amber-600 border border-amber-200/60 font-bold'
                           }`}>
                             {cmp.priority}
                           </span>
@@ -2114,7 +2398,7 @@ export default function ShopioAdminPortal({
                           <select
                             value={cmp.status}
                             onChange={(e) => handleComplaintStatus(cmp.id, e.target.value)}
-                            className="bg-[#0B0F19] border border-[#334155] text-white rounded-lg px-2 py-1 text-[11px] outline-none"
+                            className="bg-[#F8F9FA] border border-slate-200 text-white rounded-lg px-2 py-1 text-[11px] outline-none"
                           >
                             {['Open', 'In Progress', 'Resolved', 'Closed'].map((s) => (
                               <option key={s} value={s}>{s}</option>
@@ -2136,17 +2420,17 @@ export default function ShopioAdminPortal({
           {activeSection === 'notifications' && (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl font-black text-white">Notification Broadcast Center</h1>
-                <p className="text-xs text-slate-400 mt-0.5">Send targeted push alerts and announcements to users & sellers.</p>
+                <h1 className="text-2xl font-black text-slate-900">Notification Broadcast Center</h1>
+                <p className="text-xs text-gray-500 mt-0.5">Send targeted push alerts and announcements to users & sellers.</p>
               </div>
 
-              <div className="bg-[#161F30] border border-[#27354A] rounded-3xl p-6 shadow-lg max-w-2xl space-y-4">
+              <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-lg max-w-2xl space-y-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Target Audience</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Target Audience</label>
                   <select
                     value={broadcastMessage.target}
                     onChange={(e) => setBroadcastMessage({ ...broadcastMessage, target: e.target.value })}
-                    className="w-full bg-[#0B0F19] border border-[#334155] rounded-xl px-3 py-2 text-xs text-white outline-none"
+                    className="w-full bg-[#F8F9FA] border border-slate-200 rounded-xl px-3 py-2 text-xs text-gray-800 bg-gray-50 border border-slate-200 outline-none focus:border-[#F43397]"
                   >
                     <option value="All Users">All Registered Users (14,892)</option>
                     <option value="All Sellers">All Active Sellers (842)</option>
@@ -2157,24 +2441,24 @@ export default function ShopioAdminPortal({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Broadcast Title</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Broadcast Title</label>
                   <input
                     type="text"
                     value={broadcastMessage.title}
                     onChange={(e) => setBroadcastMessage({ ...broadcastMessage, title: e.target.value })}
                     placeholder="e.g. Mega Festive Sale Live Now!"
-                    className="w-full bg-[#0B0F19] border border-[#334155] rounded-xl px-3 py-2 text-xs text-white outline-none"
+                    className="w-full bg-[#F8F9FA] border border-slate-200 rounded-xl px-3 py-2 text-xs text-gray-800 bg-gray-50 border border-slate-200 outline-none focus:border-[#F43397]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Message Text</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Message Text</label>
                   <textarea
                     rows={3}
                     value={broadcastMessage.text}
                     onChange={(e) => setBroadcastMessage({ ...broadcastMessage, text: e.target.value })}
                     placeholder="Enter the push notification message body..."
-                    className="w-full bg-[#0B0F19] border border-[#334155] rounded-xl px-3 py-2 text-xs text-white outline-none"
+                    className="w-full bg-[#F8F9FA] border border-slate-200 rounded-xl px-3 py-2 text-xs text-gray-800 bg-gray-50 border border-slate-200 outline-none focus:border-[#F43397]"
                   />
                 </div>
 
@@ -2198,25 +2482,25 @@ export default function ShopioAdminPortal({
           {activeSection === 'analytics' && (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl font-black text-white">Advanced Analytics & Reports</h1>
-                <p className="text-xs text-slate-400 mt-0.5">In-depth breakdown of conversion funnels, AOV and geography.</p>
+                <h1 className="text-2xl font-black text-slate-900">Advanced Analytics & Reports</h1>
+                <p className="text-xs text-gray-500 mt-0.5">In-depth breakdown of conversion funnels, AOV and geography.</p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="p-5 rounded-2xl bg-[#161F30] border border-[#27354A]">
-                  <p className="text-xs text-slate-400">Average Order Value (AOV)</p>
+                <div className="p-5 rounded-2xl bg-white border border-slate-200">
+                  <p className="text-xs text-gray-500">Average Order Value (AOV)</p>
                   <p className="text-2xl font-black text-white mt-1">₹895</p>
                   <span className="text-[10px] text-emerald-400 font-bold">+5.2% vs last month</span>
                 </div>
-                <div className="p-5 rounded-2xl bg-[#161F30] border border-[#27354A]">
-                  <p className="text-xs text-slate-400">Checkout Conversion Rate</p>
+                <div className="p-5 rounded-2xl bg-white border border-slate-200">
+                  <p className="text-xs text-gray-500">Checkout Conversion Rate</p>
                   <p className="text-2xl font-black text-emerald-400 mt-1">4.2%</p>
                   <span className="text-[10px] text-emerald-400 font-bold">Above e-commerce benchmark</span>
                 </div>
-                <div className="p-5 rounded-2xl bg-[#161F30] border border-[#27354A]">
-                  <p className="text-xs text-slate-400">Top State by Volume</p>
+                <div className="p-5 rounded-2xl bg-white border border-slate-200">
+                  <p className="text-xs text-gray-500">Top State by Volume</p>
                   <p className="text-2xl font-black text-[#F43397] mt-1">Maharashtra (34%)</p>
-                  <span className="text-[10px] text-slate-400">Followed by Gujarat & Delhi</span>
+                  <span className="text-[10px] text-gray-500">Followed by Gujarat & Delhi</span>
                 </div>
               </div>
             </div>
@@ -2228,16 +2512,16 @@ export default function ShopioAdminPortal({
           {activeSection === 'settings' && (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl font-black text-white">Settings & Role Permissions</h1>
-                <p className="text-xs text-slate-400 mt-0.5">Configure platform security, roles matrix and maintenance modes.</p>
+                <h1 className="text-2xl font-black text-slate-900">Settings & Role Permissions</h1>
+                <p className="text-xs text-gray-500 mt-0.5">Configure platform security, roles matrix and maintenance modes.</p>
               </div>
 
               {/* Roles & Permissions Matrix */}
-              <div className="bg-[#161F30] border border-[#27354A] rounded-3xl p-5 shadow-lg overflow-x-auto space-y-4">
-                <h3 className="font-bold text-sm text-white">Admin Roles & Permissions System</h3>
+              <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow overflow-x-auto space-y-4">
+                <h3 className="font-bold text-sm text-slate-900">Admin Roles & Permissions System</h3>
                 <table className="w-full text-left text-xs">
                   <thead>
-                    <tr className="border-b border-[#27354A] text-slate-400">
+                    <tr className="border-b border-slate-100 text-gray-500">
                       <th className="pb-3 font-bold">Role</th>
                       <th className="pb-3 font-bold text-center">View</th>
                       <th className="pb-3 font-bold text-center">Create</th>
@@ -2248,10 +2532,10 @@ export default function ShopioAdminPortal({
                       <th className="pb-3 font-bold text-center">Manage Orders</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#27354A]/60 font-medium">
+                  <tbody className="divide-y divide-slate-100 font-medium">
                     {Object.entries(ROLE_PERMISSIONS_MATRIX).map(([rName, perms]) => (
-                      <tr key={rName} className="hover:bg-[#1E293B]/60 transition-colors">
-                        <td className="py-3 font-bold text-white">{rName}</td>
+                      <tr key={rName} className="hover:bg-gray-50 transition-colors">
+                        <td className="py-3 font-bold text-gray-900">{rName}</td>
                         <td className="py-3 text-center">{perms.view ? '✅' : '❌'}</td>
                         <td className="py-3 text-center">{perms.create ? '✅' : '❌'}</td>
                         <td className="py-3 text-center">{perms.edit ? '✅' : '❌'}</td>
@@ -2267,20 +2551,20 @@ export default function ShopioAdminPortal({
 
               {/* Maintenance & Security policies */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-5 rounded-2xl bg-[#161F30] border border-[#27354A] space-y-2">
-                  <h4 className="font-bold text-white text-xs">Emergency Maintenance Mode</h4>
-                  <p className="text-[11px] text-slate-400">Only administrators can browse platform when activated.</p>
+                <div className="p-5 rounded-2xl bg-white border border-slate-200 space-y-2">
+                  <h4 className="font-bold text-slate-900 text-xs">Emergency Maintenance Mode</h4>
+                  <p className="text-[11px] text-gray-500">Only administrators can browse platform when activated.</p>
                   <button
                     onClick={() => onShowToast?.('Maintenance mode toggled', 'info')}
-                    className="px-3 py-1.5 bg-[#1E293B] hover:bg-slate-700 text-xs font-bold text-slate-200 rounded-xl border border-[#334155]"
+                    className="px-3 py-1.5 bg-gray-50 hover:bg-pink-50 hover:text-[#9F2089] text-xs font-bold text-gray-800 rounded-xl border border-slate-200"
                   >
                     Toggle Maintenance Mode
                   </button>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-[#161F30] border border-[#27354A] space-y-2">
-                  <h4 className="font-bold text-white text-xs">Admin Session Security</h4>
-                  <p className="text-[11px] text-slate-400">JWT Token Expiry: 12 Hours with Idle Auto-lock.</p>
+                <div className="p-5 rounded-2xl bg-white border border-slate-200 space-y-2">
+                  <h4 className="font-bold text-slate-900 text-xs">Admin Session Security</h4>
+                  <p className="text-[11px] text-gray-500">JWT Token Expiry: 12 Hours with Idle Auto-lock.</p>
                   <span className="text-[10px] text-emerald-400 font-bold">● Active Session Protected</span>
                 </div>
               </div>
@@ -2292,24 +2576,24 @@ export default function ShopioAdminPortal({
       {/* Item Details View Modal */}
       {selectedItemModal && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#161F30] border border-[#27354A] rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl animate-fade-in text-xs">
-            <div className="flex items-center justify-between border-b border-[#27354A] pb-3">
+          <div className="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl animate-fade-in text-xs">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <span className="font-black text-white text-sm">
                 {selectedItemModal.type === 'order' ? `Order Details #${selectedItemModal.item.id}` : `${selectedItemModal.type.toUpperCase()} Record`}
               </span>
               <button
                 onClick={() => setSelectedItemModal(null)}
-                className="text-slate-400 hover:text-white"
+                className="text-gray-500 hover:text-white"
               >
                 ✕
               </button>
             </div>
-            <pre className="bg-[#0B0F19] p-3 rounded-2xl text-[11px] font-mono text-pink-300 overflow-x-auto">
+            <pre className="bg-[#F8F9FA] p-3 rounded-2xl text-[11px] font-mono text-pink-300 overflow-x-auto">
               {JSON.stringify(selectedItemModal.item, null, 2)}
             </pre>
             <button
               onClick={() => setSelectedItemModal(null)}
-              className="w-full py-2.5 rounded-xl bg-[#1E293B] hover:bg-slate-700 text-white font-bold"
+              className="w-full py-2.5 rounded-xl bg-gray-50 hover:bg-pink-50 hover:text-[#9F2089] text-white font-bold"
             >
               Close
             </button>

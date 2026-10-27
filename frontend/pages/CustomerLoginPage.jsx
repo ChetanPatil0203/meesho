@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
-import adminService from '../services/adminService';
+import adminService from '@admin/adminService';
 import { triggerConfetti } from '../utils/confetti';
 
 export default function CustomerLoginPage({

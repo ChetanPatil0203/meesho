@@ -1,0 +1,10 @@
+{
+  "name": "meesho-admin",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -n \"ADMIN,SERVER\" -c \"cyan,magenta\" \"vite .. --host --mode admin --open /admin/\" \"nodemon ../backend/index.js\"",
+    "build": "vite build .."
+  }
+}
